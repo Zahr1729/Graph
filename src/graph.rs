@@ -38,6 +38,7 @@ impl Edge {
     }
 }
 
+/// Generic Graph structure.
 pub struct Graph {
     node_counter: NodeId,
     edge_counter: EdgeId,
@@ -56,22 +57,25 @@ impl Graph {
         }
     }
 
+    /// Add node
     pub fn add_node(&mut self, node: Node) {
         self.node_map.insert(self.node_counter, node);
         self.node_counter.increment();
     }
 
+    /// Add new node
     pub fn add_new_node(&mut self) {
         let new_node = Node::default();
         self.add_node(new_node);
     }
 
+    /// Add edge without checking if such an edge is well definied.
     fn unsafe_add_edge(&mut self, edge: Edge) {
         self.edge_map.insert(self.edge_counter, edge);
         self.edge_counter.increment();
     }
 
-    /// Add a new edge, failing if the node id do not correspond to nodes.
+    /// Add edge, failing if the node id do not correspond to nodes.
     fn add_edge(&mut self, edge: Edge) -> Result<(), GraphError> {
         self.verify_node(edge.first)?;
         self.verify_node(edge.second)?;
@@ -79,6 +83,7 @@ impl Graph {
         Ok(())
     }
 
+    /// Get node corresponding to node id
     pub fn get_node(&self, node_id: NodeId) -> Result<Node, GraphError> {
         match self.node_map.get(&node_id) {
             None => return Err(GraphError::NodeNotFoundError { id: node_id }),
@@ -86,6 +91,7 @@ impl Graph {
         }
     }
 
+    /// Get edge corresponding to edge id
     pub fn get_edge(&self, edge_id: EdgeId) -> Result<Edge, GraphError> {
         match self.edge_map.get(&edge_id) {
             None => return Err(GraphError::EdgeNotFoundError { id: edge_id }),
@@ -93,31 +99,43 @@ impl Graph {
         }
     }
 
+    // Attempt to remove node from graph
+    /// 
+    /// Only use this if node_id is confirmed to be a valid key
     fn unsafe_remove_node(&mut self, node_id: NodeId) {
         self.remove_edges_dependent_on_node(node_id);
         self.node_map.remove(&node_id);
     }
 
+    /// Attempt to remove node from graph
     pub fn remove_node(&mut self, node_id: NodeId) -> Result<(), GraphError> {
         self.verify_node(node_id)?;
         self.unsafe_remove_node(node_id);
         Ok(())
     }
 
+    // Remove all edges which contain the given node.
     fn remove_edges_dependent_on_node(&mut self, node_id: NodeId) {
         for edge_id in self.edge_map.keys()
-            .filter(|&&id| self.get_edge(id).is_ok())
-            .filter(|&&id| self.get_edge(id).unwrap().contains_node(&node_id))
+            .filter(|&&id| {
+                match self.get_edge(id) {
+                    Err(_) => false,
+                    Ok(edge) => edge.contains_node(&node_id),
+            }})
             .map(|edge_id| edge_id.clone())
             .collect::<Vec<_>>() {
             self.unsafe_remove_edge(edge_id);
         }
     }  
 
+    /// Attempt to remove edge from graph
+    /// 
+    /// Only use this if edge_id is confirmed to be a valid key
     fn unsafe_remove_edge(&mut self, edge_id: EdgeId) {
         self.edge_map.remove(&edge_id);
     }
 
+    /// Attempt to remove edge from graph
     pub fn remove_edge(&mut self, edge_id: EdgeId) -> Result<(), GraphError> {
         self.verify_edge(edge_id)?;
         self.unsafe_remove_edge(edge_id);
@@ -126,6 +144,7 @@ impl Graph {
 }
 
 impl Graph {
+    /// Verify node is well defined
     fn verify_node(&self, node_id: NodeId) -> Result<(), GraphError> {
         match self.get_node(node_id) {
             Err(e) => Err(e),
@@ -133,6 +152,7 @@ impl Graph {
         }
     }
 
+    /// Verify edge is well defined
     fn verify_edge(&self, edge_id: EdgeId) -> Result<(), GraphError> {
         match self.get_edge(edge_id) {
             Err(e) => return Err(e),
@@ -146,6 +166,8 @@ impl Graph {
         Ok(())
     }
 
+    /// Verify the entire graph is well defined
+    /// i.e. all the edges exist and map to existing nodes
     fn verify_graph(&self) -> Result<(), GraphError> {
         for &node_id in self.node_map.keys().clone() {
             self.verify_node(node_id)?;
