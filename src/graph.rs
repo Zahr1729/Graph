@@ -103,7 +103,7 @@ impl Graph {
     /// 
     /// Only use this if node_id is confirmed to be a valid key
     fn unsafe_remove_node(&mut self, node_id: NodeId) {
-        self.remove_edges_dependent_on_node(node_id);
+        self.unsafe_remove_edges_dependent_on_node(node_id);
         self.node_map.remove(&node_id);
     }
 
@@ -115,7 +115,7 @@ impl Graph {
     }
 
     // Remove all edges which contain the given node.
-    fn remove_edges_dependent_on_node(&mut self, node_id: NodeId) {
+    fn unsafe_remove_edges_dependent_on_node(&mut self, node_id: NodeId) {
         for edge_id in self.edge_map.keys()
             .filter(|&&id| {
                 match self.get_edge(id) {
@@ -126,6 +126,13 @@ impl Graph {
             .collect::<Vec<_>>() {
             self.unsafe_remove_edge(edge_id);
         }
+    }
+
+    // Remove all edges which contain the given node.
+    fn remove_edges_dependent_on_node(&mut self, node_id: NodeId) -> Result<(), GraphError> {
+        self.verify_node(node_id)?;
+        self.unsafe_remove_edges_dependent_on_node(node_id);
+        Ok(())
     }  
 
     /// Attempt to remove edge from graph
@@ -210,7 +217,6 @@ mod graph_tests {
 
         assert_eq!(graph.node_counter, NodeId(3));
         assert_eq!(graph.edge_counter, EdgeId(2));
-
         assert!(graph.verify_graph().is_ok());
     }
     #[test]
@@ -255,9 +261,10 @@ mod graph_tests {
         graph.add_new_node();
         graph.add_new_node();
         graph.add_edge(Edge { first: NodeId(0), second: NodeId(1) }).unwrap();
-        graph.remove_edges_dependent_on_node(NodeId(2));
+        graph.unsafe_remove_edges_dependent_on_node(NodeId(2));
         assert_eq!(graph.node_map.len(), 2);
         assert_eq!(graph.edge_map.len(), 1);
+        assert!(graph.remove_edges_dependent_on_node(NodeId(3)).is_err())
     }
     #[test]
     fn test_remove_edge() {
