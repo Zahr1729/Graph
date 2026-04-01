@@ -1,13 +1,27 @@
-use std::{collections::{HashMap, HashSet}, hash::Hash};
+use std::{collections::{HashMap, HashSet}, fmt, hash::Hash};
 
 use crate::error::GraphError;
 
 /// For a generic graph let us have a map which takes node/edge id (stored as an int) and returns
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, Debug)]
-pub struct NodeId(usize);
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, Debug)]
-pub struct EdgeId(usize);
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord)]
+pub struct NodeId(pub usize);
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord)]
+pub struct EdgeId(pub usize);
+
+impl fmt::Debug for NodeId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)?;
+        Ok(())
+    }
+}
+
+impl fmt::Debug for EdgeId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)?;
+        Ok(())
+    }
+}
 
 impl EdgeId {
     pub fn increment(&mut self) {
@@ -21,12 +35,12 @@ impl NodeId {
     }
 }
 
-#[derive(Clone, Copy, Hash, Default)]
+#[derive(Clone, Copy, Hash, Default, Debug)]
 pub struct Node{
 }
 
 /// An Edge at minimum needs a reference to two nodes.
-#[derive(Clone, Copy, Hash, Default)]
+#[derive(Clone, Copy, Hash, Default, Eq, PartialEq, PartialOrd, Ord)]
 pub struct Edge {
     first: NodeId,
     second: NodeId,
@@ -35,6 +49,13 @@ pub struct Edge {
 impl Edge {
     pub fn contains_node(&self, node_id: &NodeId) -> bool {
         return node_id == &self.first || node_id == &self.second
+    }
+}
+
+impl fmt::Debug for Edge {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{:?}, {:?}]", self.first, self.second)?;
+        Ok(())
     }
 }
 
@@ -76,9 +97,17 @@ impl Graph {
     }
 
     /// Add edge, failing if the node id do not correspond to nodes.
-    fn add_edge(&mut self, edge: Edge) -> Result<(), GraphError> {
+    pub fn add_edge(&mut self, edge: Edge) -> Result<(), GraphError> {
         self.verify_node(edge.first)?;
         self.verify_node(edge.second)?;
+        self.unsafe_add_edge(edge);
+        Ok(())
+    }
+
+    pub fn add_edge_from_nodes(&mut self, node_id_first: NodeId, node_id_second: NodeId) -> Result<(), GraphError>{
+        self.verify_node(node_id_first)?;
+        self.verify_node(node_id_second)?;
+        let edge = Edge{first:node_id_first, second:node_id_second};
         self.unsafe_add_edge(edge);
         Ok(())
     }
@@ -188,6 +217,19 @@ impl Graph {
     }
 }
 
+impl fmt::Debug for Graph {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut node_vec = self.node_map.keys().into_iter().collect::<Vec<_>>();
+        let mut edge_vec = self.edge_map.values().into_iter().collect::<Vec<_>>();
+        node_vec.sort();
+        edge_vec.sort();
+        f.debug_struct("Graph")
+         .field("Nodes", &node_vec)
+         .field("Edges", &edge_vec)
+         .finish()
+    }
+}
+
 
 #[cfg(test)]
 mod graph_tests {
@@ -218,6 +260,14 @@ mod graph_tests {
         assert_eq!(graph.node_counter, NodeId(3));
         assert_eq!(graph.edge_counter, EdgeId(2));
         assert!(graph.verify_graph().is_ok());
+    }
+    #[test]
+    fn test_add_edge_from_nodes() {
+        let mut graph = Graph::new();
+        assert!(graph.add_edge_from_nodes(NodeId(0), NodeId(1)).is_err());
+        graph.add_new_node();
+        graph.add_new_node();
+        assert!(graph.add_edge_from_nodes(NodeId(0), NodeId(1)).is_ok());
     }
     #[test]
     fn test_add_edge_with_invalid_nodes() {
