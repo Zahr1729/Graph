@@ -178,10 +178,11 @@ mod graph_tests {
     fn test_add_edge_with_invalid_nodes_helper<N: Node, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         let edge = E::default();
+        let edge2 = E::default();
         println!("{edge:?}");
-        graph.unsafe_add_edge(edge.clone());
+        graph.unsafe_add_edge(edge);
         assert!(graph.verify().is_err());
-        assert!(graph.add_edge(edge).is_err());
+        assert!(graph.add_edge(edge2).is_err());
     }
 
     // Get

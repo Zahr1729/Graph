@@ -13,11 +13,11 @@ impl fmt::Debug for NodeId {
 }
 
 /// Anything that behaves like a node, which is everything.
-pub trait Node: Default + Clone {
+pub trait Node: Default {
     fn new() -> Self;
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug)]
 pub struct BasicNode();
 
 impl Node for BasicNode {

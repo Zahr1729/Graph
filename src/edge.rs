@@ -28,7 +28,7 @@ impl EdgeId {
 }
 
 /// An Edge at minimum needs a reference to two nodes.
-#[derive(Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BasicEdge {
     first: NodeId,
     second: NodeId,
@@ -42,7 +42,7 @@ impl fmt::Debug for BasicEdge {
 }
 
 /// Anything that behaves like a node, which is everything.
-pub trait Edge: Default + Clone + Ord + Debug {
+pub trait Edge: Default + Ord + Debug {
     fn contains_node(&self, node_id: &NodeId) -> bool;
     fn get_first(&self) -> &NodeId;
     fn get_second(&self) -> &NodeId;
