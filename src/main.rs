@@ -1,9 +1,11 @@
 mod graph;
 mod error;
+mod node;
+mod edge;
 
 use graph::Graph;
 
-use crate::graph::NodeId;
+use crate::node::NodeId;
 
 pub fn main() {
     let mut g = Graph::new();

@@ -1,70 +1,18 @@
-use std::{collections::{HashMap, HashSet}, fmt, hash::Hash};
+use std::{collections::{HashMap}, fmt};
 
 use crate::error::GraphError;
+use crate::node::{NodeId, BasicNode};
+use crate::edge::{EdgeId, Edge};
 
 /// For a generic graph let us have a map which takes node/edge id (stored as an int) and returns
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord)]
-pub struct NodeId(pub usize);
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord)]
-pub struct EdgeId(pub usize);
-
-impl fmt::Debug for NodeId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)?;
-        Ok(())
-    }
-}
-
-impl fmt::Debug for EdgeId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)?;
-        Ok(())
-    }
-}
-
-impl EdgeId {
-    pub fn increment(&mut self) {
-        self.0 += 1;
-    }
-}
-
-impl NodeId {
-    pub fn increment(&mut self) {
-        self.0 += 1;
-    }
-}
-
-#[derive(Clone, Copy, Hash, Default, Debug)]
-pub struct Node{
-}
-
-/// An Edge at minimum needs a reference to two nodes.
-#[derive(Clone, Copy, Hash, Default, Eq, PartialEq, PartialOrd, Ord)]
-pub struct Edge {
-    first: NodeId,
-    second: NodeId,
-}
-
-impl Edge {
-    pub fn contains_node(&self, node_id: &NodeId) -> bool {
-        return node_id == &self.first || node_id == &self.second
-    }
-}
-
-impl fmt::Debug for Edge {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{:?}, {:?}]", self.first, self.second)?;
-        Ok(())
-    }
-}
 
 /// Generic Graph structure.
 pub struct Graph {
     node_counter: NodeId,
     edge_counter: EdgeId,
 
-    node_map: HashMap<NodeId, Node>,
+    node_map: HashMap<NodeId, BasicNode>,
     edge_map: HashMap<EdgeId, Edge>,
 }
 
@@ -79,14 +27,14 @@ impl Graph {
     }
 
     /// Add node
-    pub fn add_node(&mut self, node: Node) {
+    pub fn add_node(&mut self, node: BasicNode) {
         self.node_map.insert(self.node_counter, node);
         self.node_counter.increment();
     }
 
     /// Add new node
     pub fn add_new_node(&mut self) {
-        let new_node = Node::default();
+        let new_node = BasicNode::default();
         self.add_node(new_node);
     }
 
@@ -113,7 +61,7 @@ impl Graph {
     }
 
     /// Get node corresponding to node id
-    pub fn get_node(&self, node_id: NodeId) -> Result<Node, GraphError> {
+    pub fn get_node(&self, node_id: NodeId) -> Result<BasicNode, GraphError> {
         match self.node_map.get(&node_id) {
             None => return Err(GraphError::NodeNotFoundError { id: node_id }),
             Some(node) => Ok(node.clone()),
@@ -233,7 +181,7 @@ impl fmt::Debug for Graph {
 
 #[cfg(test)]
 mod graph_tests {
-    use crate::graph::{Edge, EdgeId, Graph, Node, NodeId};
+    use crate::graph::{Edge, EdgeId, Graph, BasicNode, NodeId};
 
     #[test]
     fn test_new() {
@@ -249,7 +197,7 @@ mod graph_tests {
         let mut graph = Graph::new();
         // Let us add three nodes with edges between 0, 1 and 1, 2
         for _ in 0..3 {
-            graph.add_node(Node{});
+            graph.add_node(BasicNode{});
         }
         let id_0 = NodeId(0);
         let id_1 = NodeId(1);

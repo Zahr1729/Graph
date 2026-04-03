@@ -1,6 +1,7 @@
 use thiserror::Error;
 
-use crate::graph::{EdgeId, NodeId};
+use crate::edge::{EdgeId};
+use crate::node::NodeId;
 
 
 #[derive(Error, Debug)]
