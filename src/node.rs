@@ -59,23 +59,23 @@ impl<T: Node> NodeMap<T> {
     }
 
     /// Get node corresponding to node id
-    pub fn get_node(&self, node_id: NodeId) -> Result<T, GraphError> {
-        match self.node_map.get(&node_id) {
-            None => return Err(GraphError::NodeNotFoundError { id: node_id }),
-            Some(node) => Ok(node.clone()),
+    pub fn get_node(&self, node_id: &NodeId) -> Result<&T, GraphError> {
+        match self.node_map.get(node_id) {
+            None => return Err(GraphError::NodeNotFoundError { id: *node_id }),
+            Some(node) => Ok(&node),
         }
     }
 
     // Attempt to remove node from graph
     /// 
     /// Only use this if node_id is confirmed to be a valid key
-    fn unsafe_remove_node(&mut self, node_id: NodeId) {
-        self.node_map.remove(&node_id);
+    fn unsafe_remove_node(&mut self, node_id: &NodeId) {
+        self.node_map.remove(node_id);
     }
 
     /// Attempt to remove node from graph
-    pub fn remove_node(&mut self, node_id: NodeId) -> Result<(), GraphError> {
-        self.verify_node(&node_id)?;
+    pub fn remove_node(&mut self, node_id: &NodeId) -> Result<(), GraphError> {
+        self.verify_node(node_id)?;
         self.unsafe_remove_node(node_id);
         Ok(())
     }
@@ -83,14 +83,14 @@ impl<T: Node> NodeMap<T> {
     /// Insert node
     /// 
     /// If the key already exists
-    pub fn insert_node(&mut self, node_id: NodeId, node: T) {
-        self.node_map.insert(node_id, node);
+    pub fn insert_node(&mut self, node_id: NodeId, node: T) -> Option<T> {
+        self.node_map.insert(node_id, node)
     }
 
     /// Verify node is well defined
     fn verify_node(&self, node_id: &NodeId) -> Result<(), GraphError> {
         if self.node_map.contains_key(node_id) { Ok(()) }
-        else { Err(GraphError::NodeNotFoundError { id: node_id.clone() })}
+        else { Err(GraphError::NodeNotFoundError { id: *node_id })}
     }
 
     /// Verify node is well defined
@@ -128,8 +128,8 @@ mod node_tests {
         for _ in 0..5 {
             node_map.add_default_node();
         }
-        node_map.remove_node(NodeId(2)).unwrap();
-        node_map.remove_node(NodeId(3)).unwrap();
+        node_map.remove_node(&NodeId(2)).unwrap();
+        node_map.remove_node(&NodeId(3)).unwrap();
         return node_map;
     }
 
@@ -146,30 +146,32 @@ mod node_tests {
 
     fn test_get_node_helper<T: Node>() {
         let node_map = get_3_node_map::<T>();
-        assert!(node_map.get_node(NodeId(1)).is_ok());
-        assert!(node_map.get_node(NodeId(3)).is_err());
+        assert!(node_map.get_node(&NodeId(1)).is_ok());
+        assert!(node_map.get_node(&NodeId(3)).is_err());
         assert!(node_map.verify().is_ok());
     }
 
     fn test_remove_node_helper<T: Node>() {
         let mut node_map = get_3_node_map::<T>();
-        assert!(node_map.remove_node(NodeId(3)).is_err());
-        assert!(node_map.remove_node(NodeId(2)).is_ok());
+        assert!(node_map.remove_node(&NodeId(3)).is_err());
+        assert!(node_map.remove_node(&NodeId(2)).is_ok());
         assert_eq!(node_map.len(), 2);
         // Try to remove 2 again without checks.
-        node_map.unsafe_remove_node(NodeId(2));
+        node_map.unsafe_remove_node(&NodeId(2));
         assert_eq!(node_map.len(), 2);
         // remove 0 without checks
-        node_map.unsafe_remove_node(NodeId(0));
+        node_map.unsafe_remove_node(&NodeId(0));
         assert_eq!(node_map.len(), 1);
         assert!(node_map.verify().is_ok());
     }
 
     fn test_insert_node_helper<T: Node>() {
         let mut node_map = get_example_node_map::<T>();
-        node_map.insert_node(NodeId(2), T::default());
+        let ret2 = node_map.insert_node(NodeId(2), T::default());
+        assert!(ret2.is_none());
         assert_eq!(node_map.len(), 4);
-        node_map.insert_node(NodeId(0), T::default());
+        let ret0 = node_map.insert_node(NodeId(0), T::default());
+        assert!(ret0.is_some());
         assert_eq!(node_map.len(), 4);
     }
 

@@ -141,8 +141,8 @@ impl Graph {
         match self.get_edge(edge_id) {
             Err(e) => return Err(e),
             Ok(edge) => {
-                let err_1 = self.verify_node(edge.first);
-                let err_2 = self.verify_node(edge.second);
+                let err_1 = self.verify_node(*edge.first());
+                let err_2 = self.verify_node(*edge.second());
                 if err_1.is_err() { return err_1; }
                 if err_2.is_err() { return err_2; }
             },
