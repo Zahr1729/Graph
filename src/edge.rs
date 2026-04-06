@@ -1,9 +1,11 @@
 use std::{collections::HashMap, fmt::{self, Debug}};
 
+use serde::{Deserialize, Serialize};
+
 use crate::{error::GraphError, node::{NodeId}};
 
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct EdgeId(pub usize);
 
 
@@ -22,7 +24,7 @@ impl fmt::Debug for EdgeId {
 }
 
 /// An Edge at minimum needs a reference to two nodes.
-#[derive(Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct BasicEdge {
     first: NodeId,
     second: NodeId,
@@ -72,6 +74,7 @@ impl Edge for BasicEdge {
 }
 
 /// Structure to deal with storing nodes in a graph.
+#[derive(Serialize, Deserialize)]
 pub struct EdgeMap<E: Edge>{
     edge_counter: usize,
     pub edge_map: HashMap<EdgeId, E>,

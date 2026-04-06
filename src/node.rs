@@ -1,8 +1,10 @@
 use std::{collections::HashMap, fmt};
 
+use serde::{Deserialize, Serialize};
+
 use crate::error::GraphError;
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct NodeId(pub usize);
 
 impl fmt::Debug for NodeId {
@@ -17,7 +19,7 @@ pub trait Node {
     fn new() -> Self;
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct BasicNode();
 
 impl Node for BasicNode {
@@ -27,9 +29,10 @@ impl Node for BasicNode {
 }
 
 /// Structure to deal with storing nodes in a graph.
-pub struct NodeMap<Node>{
+#[derive(Serialize, Deserialize)]
+pub struct NodeMap<N: Node>{
     node_counter: usize,
-    pub node_map: HashMap<NodeId, Node>,
+    pub node_map: HashMap<NodeId, N>,
 }
 
 impl<N: Node> NodeMap<N> {
