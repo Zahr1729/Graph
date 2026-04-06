@@ -1,5 +1,7 @@
 use std::{collections::{HashMap}, fmt};
 
+use serde::{Deserialize, Serialize};
+
 use crate::error::GraphError;
 use crate::node::{Node, NodeId, BasicNode, NodeMap};
 use crate::edge::{Edge, EdgeId, BasicEdge, EdgeMap};
@@ -8,9 +10,10 @@ use crate::edge::{Edge, EdgeId, BasicEdge, EdgeMap};
 
 
 /// Generic Graph structure.
+# [derive(Serialize, Deserialize)]
 pub struct Graph<N: Node, E: Edge> {
-    node_map: NodeMap<N>,
-    edge_map: EdgeMap<E>,
+    pub(crate) node_map: NodeMap<N>,
+    pub(crate) edge_map: EdgeMap<E>,
 }
 
 impl<N: Node, E: Edge> Graph<N, E> {
@@ -120,10 +123,22 @@ impl<N: Node, E: Edge> fmt::Debug for Graph<N, E> {
     }
 }
 
+// impl<N: Node + Serialize, E: Edge + Serialize> Serialize for Graph<N, E> {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer {
+//         // serializer.serialize_map(len)
+//     }
+// }
+
 
 #[cfg(test)]
 mod graph_tests {
-    use crate::{edge::EdgeMap, graph::{BasicEdge, BasicNode, Edge, EdgeId, Graph, Node, NodeId}, node::NodeMap};
+    use std::path::Path;
+
+    use serde::{Deserialize, Serialize};
+
+    use crate::{edge::EdgeMap, graph::{BasicEdge, BasicNode, Edge, EdgeId, Graph, Node, NodeId}, node::NodeMap, saveload::{load_from_json, save_to_json}};
 
     fn get_example_graph<N: Node, E: Edge>() -> Graph<N, E> {
         let mut graph = Graph { node_map: NodeMap::<N>::new(), edge_map: EdgeMap::<E>::new() };
@@ -219,6 +234,8 @@ mod graph_tests {
         assert!(graph.insert_edge(EdgeId(8), E::default()).is_none());
     }
 
+    // Test Remove
+
     fn test_remove_node_helper<N: Node, E: Edge>() {
         let mut graph = get_example_graph::<N, E>();
         assert!(graph.remove_node(&NodeId(3)).is_none());
@@ -242,13 +259,30 @@ mod graph_tests {
         assert!(graph.remove_edge(&EdgeId(8)).is_none());
     }
 
+    // Test debug
+
     fn test_debug_helper<N: Node, E: Edge>() {
         let node_map = get_example_graph::<N, E>();
         assert_eq!(format!("{node_map:?}"),
         "Graph { Nodes: [0, 1, 2, 4, 5, 6], Edges: [[0, 0], [0, 1], [0, 2], [1, 4], [2, 5], [4, 6], [5, 1]] }");
     }
 
-    // Remove
+    // test serde
+
+    fn test_serde_helper<N: Node + Serialize + for<'a> Deserialize<'a>, E: Edge + Serialize + for<'a> Deserialize<'a>>() {
+        let path = Path::new("./tests/data/save-load.json");
+        let g = get_example_graph::<N, E>();
+        let initial_debug = format!("{:?}", g);
+
+        // Save
+        assert!(save_to_json(path, &g).is_ok());
+
+        // load
+        let g_save_load = load_from_json::<Graph<N, E>>(&path);
+        assert!(g_save_load.is_ok());
+
+        assert_eq!(initial_debug, format!("{:?}", g_save_load.unwrap()))
+    }
 
     mod basic_graph_tests {
         use super::*;
@@ -306,6 +340,11 @@ mod graph_tests {
         #[test]
         fn test_debug() {
             test_debug_helper::<BasicNode, BasicEdge>();
+        }
+
+        #[test]
+        fn test_serde() {
+            test_serde_helper::<BasicNode, BasicEdge>();
         }
     }
 }
