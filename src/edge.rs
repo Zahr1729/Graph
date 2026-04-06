@@ -21,12 +21,6 @@ impl fmt::Debug for EdgeId {
     }
 }
 
-impl EdgeId {
-    pub fn increment(&mut self) {
-        self.0 += 1;
-    }
-}
-
 /// An Edge at minimum needs a reference to two nodes.
 #[derive(Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BasicEdge {

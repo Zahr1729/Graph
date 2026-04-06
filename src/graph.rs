@@ -143,7 +143,7 @@ mod graph_tests {
 
     // Add
 
-    fn test_add_node_helper<N: Node, E: Edge>() {
+    fn test_add_node_helper<N: Node + Default, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         let node_id0 = graph.add_node(N::default());
         let node_id1 = graph.add_node(N::default());
@@ -155,7 +155,7 @@ mod graph_tests {
         assert!(graph.verify_node(&NodeId(2)).is_err());
     }
 
-    fn test_add_edge_helper<N: Node, E: Edge>() {
+    fn test_add_edge_helper<N: Node + Default, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         graph.add_node(N::default());
         graph.add_node(N::default());
@@ -166,7 +166,7 @@ mod graph_tests {
         assert!(graph.add_edge_from_nodes(NodeId(0), NodeId(1)).is_ok());
     }
 
-    fn test_add_edge_from_nodes_helper<N: Node, E: Edge>() {
+    fn test_add_edge_from_nodes_helper<N: Node + Default, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         assert!(graph.add_edge_from_nodes(NodeId(0), NodeId(1)).is_err());
         graph.add_node(N::default());
@@ -309,73 +309,3 @@ mod graph_tests {
         }
     }
 }
-
-//     #[test]
-//     fn test_new() {
-//         let graph = Graph::new();
-//         assert_eq!(graph.node_counter, NodeId(0));
-//         assert_eq!(graph.edge_counter, EdgeId(0));
-//         assert_eq!(graph.node_map.keys().len(), 0);
-//         assert_eq!(graph.edge_map.keys().len(), 0);
-//         assert!(graph.verify_graph().is_ok())
-//     }
-//     #[test]
-//     fn test_simple_graph() {
-//         let mut graph = Graph::new();
-//         // Let us add three nodes with edges between 0, 1 and 1, 2
-//         for _ in 0..3 {
-//             graph.add_node(BasicNode{});
-//         }
-//         let id_0 = NodeId(0);
-//         let id_1 = NodeId(1);
-//         let id_2 = NodeId(2);
-//         let _ = graph.unsafe_add_edge(BasicEdge{first: id_0, second: id_1});
-//         let _ = graph.unsafe_add_edge(BasicEdge{first: id_1, second: id_2});
-
-//         assert_eq!(graph.node_counter, NodeId(3));
-//         assert_eq!(graph.edge_counter, EdgeId(2));
-//         assert!(graph.verify_graph().is_ok());
-//     }
-//     #[test]
-//     fn test_remove_node() {
-//         let mut graph = Graph::new();
-//         graph.add_new_node();
-//         assert!(graph.remove_node(NodeId(0)).is_ok());
-//     }
-//     #[test]
-//     fn test_remove_node_fail() {
-//         let mut graph = Graph::new();
-//         assert!(graph.remove_node(NodeId(0)).is_err());
-//     }
-//     #[test]
-//     fn test_remove_node_with_edges() {
-//         let mut graph = Graph::new();
-//         graph.add_new_node();
-//         graph.add_new_node();
-//         graph.add_edge(BasicEdge { first: NodeId(0), second: NodeId(1) }).unwrap();
-//         assert!(graph.remove_node(NodeId(0)).is_ok());
-//         assert_eq!(graph.node_map.len(), 1);
-//         assert_eq!(graph.edge_map.len(), 0);
-//     }
-//     #[test]
-//     fn test_remove_edges_for_node_that_does_not_exist() {
-//         let mut graph = Graph::new();
-//         graph.add_new_node();
-//         graph.add_new_node();
-//         graph.add_edge(BasicEdge { first: NodeId(0), second: NodeId(1) }).unwrap();
-//         graph.unsafe_remove_edges_dependent_on_node(NodeId(2));
-//         assert_eq!(graph.node_map.len(), 2);
-//         assert_eq!(graph.edge_map.len(), 1);
-//         assert!(graph.remove_edges_dependent_on_node(NodeId(3)).is_err())
-//     }
-//     #[test]
-//     fn test_remove_edge() {
-//         let mut graph = Graph::new();
-//         graph.add_new_node();
-//         graph.add_new_node();
-//         graph.add_edge(BasicEdge { first: NodeId(0), second: NodeId(1) }).unwrap();
-//         assert!(graph.remove_edge(EdgeId(0)).is_ok());
-//         assert_eq!(graph.node_map.len(), 2);
-//         assert_eq!(graph.edge_map.len(), 0);
-//     }
-// }

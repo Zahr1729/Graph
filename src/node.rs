@@ -13,7 +13,7 @@ impl fmt::Debug for NodeId {
 }
 
 /// Anything that behaves like a node, which is everything.
-pub trait Node: Default {
+pub trait Node {
     fn new() -> Self;
 }
 
@@ -90,7 +90,7 @@ impl<N: Node> fmt::Debug for NodeMap<N> {
 mod node_tests {
     use crate::node::{BasicNode, Node, NodeId, NodeMap};
 
-    fn get_3_node_map<N: Node>() -> NodeMap<N> {
+    fn get_3_node_map<N: Node + Default>() -> NodeMap<N> {
         let mut node_map = NodeMap::<N>::new();
         for _ in 0..3 {
             node_map.add(N::default());
@@ -98,7 +98,7 @@ mod node_tests {
         return node_map;
     }
 
-    fn get_example_node_map<N: Node>() -> NodeMap<N> {
+    fn get_example_node_map<N: Node + Default>() -> NodeMap<N> {
         let mut node_map = NodeMap::<N>::new();
         for _ in 0..5 {
             node_map.add(N::default());
@@ -108,7 +108,7 @@ mod node_tests {
         return node_map;
     }
 
-    fn test_add_helper<N: Node>() {
+    fn test_add_helper<N: Node + Default>() {
         let mut node_map = NodeMap::<N>::new();
 
         let id0 = node_map.add(N::default());
@@ -122,13 +122,13 @@ mod node_tests {
         assert!(node_map.verify_node(&NodeId(2)).is_err());
     }
 
-    fn test_get_helper<N: Node>() {
+    fn test_get_helper<N: Node + Default>() {
         let node_map = get_3_node_map::<N>();
         assert!(node_map.get(&NodeId(1)).is_ok());
         assert!(node_map.get(&NodeId(3)).is_err());
     }
 
-    fn test_remove_helper<N: Node>() {
+    fn test_remove_helper<N: Node + Default>() {
         let mut node_map = get_3_node_map::<N>();
         assert!(node_map.remove(&NodeId(3)).is_none());
         assert!(node_map.remove(&NodeId(2)).is_some());
@@ -144,7 +144,7 @@ mod node_tests {
         assert!(node_map.verify_node(&NodeId(1)).is_ok());
     }
 
-    fn test_insert_helper<N: Node>() {
+    fn test_insert_helper<N: Node + Default>() {
         let mut node_map = get_example_node_map::<N>();
         let ret2 = node_map.insert(NodeId(2), N::default());
         assert!(ret2.is_none());
@@ -154,7 +154,7 @@ mod node_tests {
         assert_eq!(node_map.len(), 4);
     }
 
-    fn test_debug_helper<N: Node>() {
+    fn test_debug_helper<N: Node + Default>() {
         let node_map = get_example_node_map::<N>();
         assert_eq!(format!("{node_map:?}"), "Nodes: [0, 1, 4]")
     }
