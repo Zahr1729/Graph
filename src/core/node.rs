@@ -2,7 +2,7 @@ use std::{collections::HashMap, fmt};
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::GraphError;
+use crate::core::error::GraphError;
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct NodeId(pub usize);
@@ -91,7 +91,7 @@ impl<N: Node> fmt::Debug for NodeMap<N> {
 
 #[cfg(test)]
 mod node_tests {
-    use crate::node::{BasicNode, Node, NodeId, NodeMap};
+    use crate::core::node::{BasicNode, Node, NodeId, NodeMap};
 
     fn get_3_node_map<N: Node + Default>() -> NodeMap<N> {
         let mut node_map = NodeMap::<N>::new();

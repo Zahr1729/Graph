@@ -2,7 +2,7 @@ use std::{collections::HashMap, fmt::{self, Debug}};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{error::GraphError, node::{NodeId}};
+use crate::core::{error::GraphError, node::{NodeId}};
 
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord, Serialize, Deserialize)]
@@ -162,7 +162,7 @@ impl<E: Edge> fmt::Debug for EdgeMap<E> {
 
 #[cfg(test)]
 mod node_tests {
-    use crate::edge::{BasicEdge, Edge, EdgeId, EdgeMap, NodeId};
+    use crate::core::edge::{BasicEdge, Edge, EdgeId, EdgeMap, NodeId};
 
     fn get_3_default_edge_map<E: Edge>() -> EdgeMap<E> {
         let mut node_map = EdgeMap::<E>::new();

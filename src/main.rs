@@ -1,12 +1,10 @@
-mod graph;
-mod error;
-mod node;
-mod edge;
-mod saveload;
+mod core;
+mod utils;
 
 use std::path::Path;
 
-use crate::{edge::{BasicEdge, Edge, EdgeMap}, graph::Graph, node::{BasicNode, Node, NodeId, NodeMap}, saveload::{load_from_json, save_to_json}};
+use crate::core::{edge::{BasicEdge, Edge, EdgeMap}, graph::Graph, node::{BasicNode, Node, NodeId, NodeMap}};
+use crate::utils::saveload::{load_from_json, save_to_json};
 
 // Duplicate code to testing.
 fn get_example_graph<N: Node, E: Edge>() -> Graph<N, E> {

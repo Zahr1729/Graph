@@ -2,9 +2,9 @@ use std::{collections::{HashMap}, fmt};
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::GraphError;
-use crate::node::{Node, NodeId, BasicNode, NodeMap};
-use crate::edge::{Edge, EdgeId, BasicEdge, EdgeMap};
+use crate::core::error::GraphError;
+use crate::core::node::{Node, NodeId, BasicNode, NodeMap};
+use crate::core::edge::{Edge, EdgeId, BasicEdge, EdgeMap};
 
 // /// For a generic graph let us have a map which takes node/edge id (stored as an int) and returns
 
@@ -138,7 +138,8 @@ mod graph_tests {
 
     use serde::{Deserialize, Serialize};
 
-    use crate::{edge::EdgeMap, graph::{BasicEdge, BasicNode, Edge, EdgeId, Graph, Node, NodeId}, node::NodeMap, saveload::{load_from_json, save_to_json}};
+    use crate::core::{edge::EdgeMap, graph::{BasicEdge, BasicNode, Edge, EdgeId, Graph, Node, NodeId}, node::NodeMap};
+    use crate::utils::saveload::{load_from_json, save_to_json};
 
     fn get_example_graph<N: Node, E: Edge>() -> Graph<N, E> {
         let mut graph = Graph { node_map: NodeMap::<N>::new(), edge_map: EdgeMap::<E>::new() };

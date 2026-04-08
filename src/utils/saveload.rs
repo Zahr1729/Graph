@@ -2,7 +2,7 @@ use std::{error::Error, fs::File, io::{BufReader, BufWriter, Read, Write}, path:
 
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
-use crate::error::IoError;
+use crate::core::error::IoError;
 
 
 pub fn save_to_json<'a, T: Serialize>(file_path: &'a Path, data: &'a T) -> Result<(), IoError<'a>>{

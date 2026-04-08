@@ -2,8 +2,8 @@ use std::path::Path;
 
 use thiserror::Error;
 
-use crate::edge::{EdgeId};
-use crate::node::NodeId;
+use crate::core::edge::{EdgeId};
+use crate::core::node::NodeId;
 
 
 #[derive(Error, Debug)]
