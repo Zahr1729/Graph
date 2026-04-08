@@ -3,8 +3,8 @@ use std::{collections::{HashMap}, fmt};
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::GraphError;
-use crate::core::node::{Node, NodeId, BasicNode, NodeMap};
-use crate::core::edge::{Edge, EdgeId, BasicEdge, EdgeMap};
+use crate::core::node::{Node, NodeId, NodeMap};
+use crate::core::edge::{Edge, EdgeId, EdgeMap};
 
 // /// For a generic graph let us have a map which takes node/edge id (stored as an int) and returns
 
@@ -132,16 +132,15 @@ impl<N: Node, E: Edge> fmt::Debug for Graph<N, E> {
 // }
 
 
-#[cfg(test)]
-mod graph_tests {
+pub(crate) mod graph_tests {
     use std::path::Path;
 
     use serde::{Deserialize, Serialize};
 
-    use crate::core::{edge::EdgeMap, graph::{BasicEdge, BasicNode, Edge, EdgeId, Graph, Node, NodeId}, node::NodeMap};
+    use crate::core::{edge::EdgeMap, graph::{Edge, EdgeId, Graph, Node, NodeId}, node::NodeMap};
     use crate::utils::saveload::{load_from_json, save_to_json};
 
-    fn get_example_graph<N: Node, E: Edge>() -> Graph<N, E> {
+    pub fn get_example_graph<N: Node, E: Edge>() -> Graph<N, E> {
         let mut graph = Graph { node_map: NodeMap::<N>::new(), edge_map: EdgeMap::<E>::new() };
         for _ in 0..7 { graph.add_node(N::new()); }
         graph.remove_node(&NodeId(3));
@@ -159,7 +158,7 @@ mod graph_tests {
 
     // Add
 
-    fn test_add_node_helper<N: Node + Default, E: Edge>() {
+    pub fn test_add_node_helper<N: Node + Default, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         let node_id0 = graph.add_node(N::default());
         let node_id1 = graph.add_node(N::default());
@@ -171,7 +170,7 @@ mod graph_tests {
         assert!(graph.verify_node(&NodeId(2)).is_err());
     }
 
-    fn test_add_edge_helper<N: Node + Default, E: Edge>() {
+    pub fn test_add_edge_helper<N: Node + Default, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         graph.add_node(N::default());
         graph.add_node(N::default());
@@ -182,7 +181,7 @@ mod graph_tests {
         assert!(graph.add_edge_from_nodes(NodeId(0), NodeId(1)).is_ok());
     }
 
-    fn test_add_edge_from_nodes_helper<N: Node + Default, E: Edge>() {
+    pub fn test_add_edge_from_nodes_helper<N: Node + Default, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         assert!(graph.add_edge_from_nodes(NodeId(0), NodeId(1)).is_err());
         graph.add_node(N::default());
@@ -191,7 +190,7 @@ mod graph_tests {
     }
 
     
-    fn test_add_edge_with_invalid_nodes_helper<N: Node, E: Edge>() {
+    pub fn test_add_edge_with_invalid_nodes_helper<N: Node, E: Edge>() {
         let mut graph = Graph::<N, E>::new();
         let edge = E::default();
         let edge2 = E::default();
@@ -203,14 +202,14 @@ mod graph_tests {
 
     // Get
 
-    fn test_get_node_helper<N: Node, E: Edge>() {
+    pub fn test_get_node_helper<N: Node, E: Edge>() {
         let graph = get_example_graph::<N, E>();
         assert!(graph.get_node(&NodeId(3)).is_err());
         assert!(graph.get_node(&NodeId(7)).is_err());
         assert!(graph.get_node(&NodeId(0)).is_ok())
     }
 
-    fn test_get_edge_helper<N: Node, E: Edge>() {
+    pub fn test_get_edge_helper<N: Node, E: Edge>() {
         let graph = get_example_graph::<N, E>();
         assert!(graph.get_edge(&EdgeId(3)).is_err());
         assert!(graph.get_edge(&EdgeId(8)).is_err());
@@ -220,14 +219,14 @@ mod graph_tests {
 
     // Insert
 
-    fn test_insert_node_helper<N: Node, E: Edge>() {
+    pub fn test_insert_node_helper<N: Node, E: Edge>() {
         let mut graph = get_example_graph::<N, E>();
         assert!(graph.insert_node(NodeId(0), N::new()).is_some());
         assert!(graph.insert_node(NodeId(3), N::new()).is_none());
         assert!(graph.insert_node(NodeId(7), N::new()).is_none());
     }
 
-    fn test_insert_edge_helper<N: Node, E: Edge>() {
+    pub fn test_insert_edge_helper<N: Node, E: Edge>() {
         let mut graph = get_example_graph::<N, E>();
         assert!(graph.insert_edge(EdgeId(0), E::default()).is_some());
         assert!(graph.insert_edge(EdgeId(3), E::default()).is_none());
@@ -237,7 +236,7 @@ mod graph_tests {
 
     // Test Remove
 
-    fn test_remove_node_helper<N: Node, E: Edge>() {
+    pub fn test_remove_node_helper<N: Node, E: Edge>() {
         let mut graph = get_example_graph::<N, E>();
         assert!(graph.remove_node(&NodeId(3)).is_none());
         assert!(graph.remove_node(&NodeId(7)).is_none());
@@ -252,7 +251,7 @@ mod graph_tests {
         assert_eq!(graph.get_edge_ids().len(), 2);
     }
 
-    fn test_remove_edge_helper<N: Node, E: Edge>() {
+    pub fn test_remove_edge_helper<N: Node, E: Edge>() {
         let mut graph = get_example_graph::<N, E>();
         assert!(graph.remove_edge(&EdgeId(0)).is_some());
         assert!(graph.remove_edge(&EdgeId(3)).is_none());
@@ -262,7 +261,7 @@ mod graph_tests {
 
     // Test debug
 
-    fn test_debug_helper<N: Node, E: Edge>() {
+    pub fn test_debug_helper<N: Node, E: Edge>() {
         let node_map = get_example_graph::<N, E>();
         assert_eq!(format!("{node_map:?}"),
         "Graph { Nodes: [0, 1, 2, 4, 5, 6], Edges: [[0, 0], [0, 1], [0, 2], [1, 4], [2, 5], [4, 6], [5, 1]] }");
@@ -270,7 +269,7 @@ mod graph_tests {
 
     // test serde
 
-    fn test_serde_helper<N: Node + Serialize + for<'a> Deserialize<'a>, E: Edge + Serialize + for<'a> Deserialize<'a>>() {
+    pub fn test_serde_helper<N: Node + Serialize + for<'a> Deserialize<'a>, E: Edge + Serialize + for<'a> Deserialize<'a>>() {
         let path = Path::new("./tests/data/save-load.json");
         let g = get_example_graph::<N, E>();
         let initial_debug = format!("{:?}", g);
@@ -283,69 +282,5 @@ mod graph_tests {
         assert!(g_save_load.is_ok());
 
         assert_eq!(initial_debug, format!("{:?}", g_save_load.unwrap()))
-    }
-
-    mod basic_graph_tests {
-        use super::*;
-
-        #[test]
-        fn test_add_node() {
-            test_add_node_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_add_edge() {
-            test_add_edge_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_add_edge_from_nodes() {
-            test_add_edge_from_nodes_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_add_edge_with_invalid_nodes() {
-            test_add_edge_with_invalid_nodes_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_get_node() {
-            test_get_node_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_get_edge() {
-            test_get_edge_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_insert_node() {
-            test_insert_node_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_insert_edge() {
-            test_insert_edge_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_remove_node() {
-            test_remove_node_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_remove_edge() {
-            test_remove_edge_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_debug() {
-            test_debug_helper::<BasicNode, BasicEdge>();
-        }
-
-        #[test]
-        fn test_serde() {
-            test_serde_helper::<BasicNode, BasicEdge>();
-        }
     }
 }

@@ -23,20 +23,6 @@ impl fmt::Debug for EdgeId {
     }
 }
 
-/// An Edge at minimum needs a reference to two nodes.
-#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub struct BasicEdge {
-    first: NodeId,
-    second: NodeId,
-}
-
-impl fmt::Debug for BasicEdge {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{:?}, {:?}]", self.first, self.second)?;
-        Ok(())
-    }
-}
-
 /// Anything that behaves like a node, which is everything.
 pub trait Edge: Default + Ord + Debug {
     fn contains_node(&self, node_id: &NodeId) -> bool;
@@ -56,22 +42,9 @@ pub trait Edge: Default + Ord + Debug {
         edge.set_nodes(first, second);
         edge
     }
-    fn dbg(&self) -> impl Debug{
-        BasicEdge{first:self.get_first().clone(), second:self.get_second().clone()};
-    }
+    fn dbg(&self) -> impl Debug;
 }
 
-
-impl Edge for BasicEdge {
-    fn contains_node(&self, node_id: &NodeId) -> bool {
-        return node_id == &self.first || node_id == &self.second
-    }
-    
-    fn get_first(&self) -> &NodeId { &self.first }
-    fn get_second(&self) -> &NodeId { &self.second }
-    fn set_first(&mut self, node_id: NodeId) { self.first = node_id }
-    fn set_second(&mut self, node_id: NodeId) { self.second = node_id }
-}
 
 /// Structure to deal with storing nodes in a graph.
 #[derive(Serialize, Deserialize)]
@@ -160,11 +133,10 @@ impl<E: Edge> fmt::Debug for EdgeMap<E> {
 }
 
 
-#[cfg(test)]
-mod node_tests {
-    use crate::core::edge::{BasicEdge, Edge, EdgeId, EdgeMap, NodeId};
+pub(crate) mod edge_tests {
+    use crate::core::edge::{Edge, EdgeId, EdgeMap, NodeId};
 
-    fn get_3_default_edge_map<E: Edge>() -> EdgeMap<E> {
+    pub fn get_3_default_edge_map<E: Edge>() -> EdgeMap<E> {
         let mut node_map = EdgeMap::<E>::new();
         for _ in 0..3 {
             node_map.add(E::default());
@@ -172,7 +144,7 @@ mod node_tests {
         return node_map;
     }
 
-    fn get_example_default_edge_map<E: Edge>() -> EdgeMap<E> {
+    pub fn get_example_default_edge_map<E: Edge>() -> EdgeMap<E> {
         let mut node_map = EdgeMap::<E>::new();
         for _ in 0..5 {
             node_map.add(E::default());
@@ -182,7 +154,7 @@ mod node_tests {
         node_map
     }
 
-    fn get_example_non_default_edge_map<E: Edge>() -> EdgeMap<E> {
+    pub fn get_example_non_default_edge_map<E: Edge>() -> EdgeMap<E> {
         let mut node_map = EdgeMap::<E>::new();
         node_map.add_from_nodes(NodeId(0), NodeId(0));
         node_map.add_from_nodes(NodeId(0), NodeId(1));
@@ -193,7 +165,7 @@ mod node_tests {
         node_map
     }
 
-    fn test_add_helper<E: Edge>() {
+    pub fn test_add_helper<E: Edge>() {
         let mut edge_map = EdgeMap::<E>::new();
         let id0 = edge_map.add(E::default());
         assert_eq!(id0, EdgeId(0));
@@ -207,7 +179,7 @@ mod node_tests {
         assert!(edge_map.verify(&EdgeId(2)).is_err());
     }
 
-    fn test_add_from_nodes_helper<E: Edge>() {
+    pub fn test_add_from_nodes_helper<E: Edge>() {
         let mut edge_map = EdgeMap::<E>::new();
         // Add the same node multiple times
         let id0 = edge_map.add_from_nodes(NodeId(0), NodeId(2));
@@ -224,13 +196,13 @@ mod node_tests {
         assert!(edge_map.verify(&EdgeId(3)).is_err());
     }
 
-    fn test_get_helper<E: Edge>() {
+    pub fn test_get_helper<E: Edge>() {
         let edge_map = get_3_default_edge_map::<E>();
         assert!(edge_map.get(&EdgeId(1)).is_ok());
         assert!(edge_map.get(&EdgeId(3)).is_err());
     }
 
-    fn test_remove_helper<E: Edge>() {
+    pub fn test_remove_helper<E: Edge>() {
         let mut edge_map = get_3_default_edge_map::<E>();
         assert!(edge_map.remove(&EdgeId(3)).is_none());
         assert!(edge_map.remove(&EdgeId(2)).is_some());
@@ -247,7 +219,7 @@ mod node_tests {
         assert!(edge_map.verify(&EdgeId(1)).is_ok());
     }
 
-    fn test_remove_edges_dependent_on_node_helper<E: Edge>() {
+    pub fn test_remove_edges_dependent_on_node_helper<E: Edge>() {
         let mut edge_map = get_example_non_default_edge_map::<E>();
         assert_eq!(edge_map.len(), 6);
         edge_map.remove_edges_dependent_on_node(&NodeId(3));
@@ -259,7 +231,7 @@ mod node_tests {
         assert!(edge_map.verify(&EdgeId(2)).is_err());
     }
 
-    fn test_insert_helper<E: Edge>() {
+    pub fn test_insert_helper<E: Edge>() {
         let mut edge_map = get_example_default_edge_map::<E>();
         let ret2 = edge_map.insert(EdgeId(2), E::default());
         assert!(ret2.is_none());
@@ -269,49 +241,11 @@ mod node_tests {
         assert_eq!(edge_map.len(), 4);
     }
 
-    fn test_debug_helper<E: Edge>() {
+    pub fn test_debug_helper<E: Edge>() {
         let edge_map = get_example_default_edge_map::<E>();
         assert_eq!(format!("{edge_map:?}"), "Edges: [[0, 0], [0, 0], [0, 0]]");
 
         let second_edge_map = get_example_non_default_edge_map::<E>();
         assert_eq!(format!("{second_edge_map:?}"), "Edges: [[0, 0], [0, 1], [2, 1], [2, 4], [4, 0], [4, 5]]");
-    }
-
-    mod basic_edge_tests {
-        use super::*;
-
-        #[test]
-        fn test_add() {
-            test_add_helper::<BasicEdge>();
-        }
-
-        #[test]
-        fn test_add_from_nodes() {
-            test_add_from_nodes_helper::<BasicEdge>();
-        }
-
-        #[test]
-        fn test_get() {
-            test_get_helper::<BasicEdge>();
-        }
-        #[test]
-        fn test_remove() {
-            test_remove_helper::<BasicEdge>();
-        }
-
-        #[test]
-        fn test_remove_edges_dependent_on_node() {
-            test_remove_edges_dependent_on_node_helper::<BasicEdge>();
-        }
-
-        #[test]
-        fn test_insert() {
-            test_insert_helper::<BasicEdge>();
-        }
-
-        #[test]
-        fn test_debug() {
-            test_debug_helper::<BasicEdge>();
-        }
     }
 }

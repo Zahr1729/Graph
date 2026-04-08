@@ -1,9 +1,10 @@
 mod core;
 mod utils;
+mod graphs;
 
 use std::path::Path;
 
-use crate::core::{edge::{BasicEdge, Edge, EdgeMap}, graph::Graph, node::{BasicNode, Node, NodeId, NodeMap}};
+use crate::{core::{edge::{Edge, EdgeMap}, graph::Graph, node::{Node, NodeId, NodeMap}}, graphs::basic::{BasicEdge, BasicNode}};
 use crate::utils::saveload::{load_from_json, save_to_json};
 
 // Duplicate code to testing.
