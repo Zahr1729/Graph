@@ -157,6 +157,26 @@ mod basic_graph_tests {
     }
 
     #[test]
+    fn test_nodes() {
+        test_nodes_helper::<BasicNode, BasicEdge>();
+    }
+
+    #[test]
+    fn test_edges() {
+        test_edges_helper::<BasicNode, BasicEdge>();
+    }
+
+    #[test]
+    fn test_get_edges() {
+        test_get_edges_helper::<BasicNode, BasicEdge>();
+    }
+
+    #[test]
+    fn test_get_neighbors() {
+        test_get_neighbors_helper::<BasicNode, BasicEdge>();
+    }
+
+    #[test]
     fn test_insert_node() {
         test_insert_node_helper::<BasicNode, BasicEdge>();
     }

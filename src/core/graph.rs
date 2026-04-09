@@ -1,4 +1,4 @@
-use std::{collections::{HashMap}, fmt};
+use std::{collections::{HashMap, HashSet}, fmt};
 
 use serde::{Deserialize, Serialize};
 
@@ -63,6 +63,35 @@ impl<N: Node, E: Edge> Graph<N, E> {
     /// Get edge corresponding to edge id
     pub fn get_edge(&self, edge_id: &EdgeId) -> Result<&E, GraphError> {
         self.edge_map.get(edge_id)
+    }
+
+    pub fn nodes(&self) -> Vec<&NodeId> {
+        self.node_map.node_map.keys().into_iter().collect::<Vec<_>>()
+    }
+
+    pub fn edges(&self) -> Vec<&EdgeId> {
+        self.edge_map.edge_map.keys().into_iter().collect::<Vec<_>>()
+    }
+
+    pub fn get_edges(&self, node_id: &NodeId) -> Vec<&EdgeId> {
+        let all_edges = self.edges();
+        let mut vec = vec![];
+        for edge_id in all_edges {
+            let edge = self.get_edge(edge_id).unwrap();
+            if edge.contains_node(node_id) {vec.push(edge_id);}
+        }
+        vec
+    }
+
+    pub fn get_neighbors(&self, node_id: &NodeId) -> Vec<&NodeId> {
+        let edges = self.get_edges(node_id);
+        let mut set = HashSet::new();
+        for edge_id in edges {
+            let edge = self.get_edge(edge_id).unwrap();
+            let arg = if edge.get_second() == node_id { edge.get_first() } else { edge.get_second() };
+            set.insert(arg);
+        }
+        set.into_iter().collect::<Vec<_>>()
     }
 
     /// Insert node
@@ -215,6 +244,41 @@ pub(crate) mod graph_tests {
         assert!(graph.get_edge(&EdgeId(8)).is_err());
         assert!(graph.get_edge(&EdgeId(7)).is_ok());
         assert!(graph.get_edge(&EdgeId(0)).is_ok())
+    }
+
+    pub fn test_nodes_helper<N: Node, E: Edge>() {
+        let graph = get_example_graph::<N, E>();
+        assert_eq!(graph.nodes().len(), graph.node_map.len())
+    }
+
+    pub fn test_edges_helper<N: Node, E: Edge>() {
+        let graph = get_example_graph::<N, E>();
+        assert_eq!(graph.edges().len(), graph.edge_map.len())
+    }
+
+    pub fn test_get_edges_helper<N: Node, E: Edge>() {
+        let graph = get_example_graph::<N, E>();
+        assert_eq!(graph.get_edges(&NodeId(0)).len(), 3);
+        assert_eq!(graph.get_edges(&NodeId(1)).len(), 3);
+        assert_eq!(graph.get_edges(&NodeId(2)).len(), 2);
+        assert_eq!(graph.get_edges(&NodeId(3)).len(), 0);
+        assert_eq!(graph.get_edges(&NodeId(4)).len(), 2);
+        assert_eq!(graph.get_edges(&NodeId(5)).len(), 2);
+        assert_eq!(graph.get_edges(&NodeId(6)).len(), 1);
+        assert_eq!(graph.get_edges(&NodeId(7)).len(), 0);
+    }
+
+    pub fn test_get_neighbors_helper<N: Node, E: Edge>() {
+        let graph = get_example_graph::<N, E>();
+        assert_eq!(graph.get_neighbors(&NodeId(0)).len(), 3);
+        assert_eq!(graph.get_neighbors(&NodeId(1)).len(), 3);
+        assert_eq!(graph.get_neighbors(&NodeId(2)).len(), 2);
+
+        let one_neighbours = graph.get_neighbors(&NodeId(1));
+
+        assert!(one_neighbours.contains(&&NodeId(0)));
+        assert!(one_neighbours.contains(&&NodeId(4)));
+        assert!(one_neighbours.contains(&&NodeId(5)));
     }
 
     // Insert
