@@ -137,32 +137,32 @@ pub(crate) mod edge_tests {
     use crate::core::edge::{Edge, EdgeId, EdgeMap, NodeId};
 
     pub fn get_3_default_edge_map<E: Edge>() -> EdgeMap<E> {
-        let mut node_map = EdgeMap::<E>::new();
+        let mut edge_map = EdgeMap::<E>::new();
         for _ in 0..3 {
-            node_map.add(E::default());
+            edge_map.add(E::default());
         }
-        return node_map;
+        return edge_map;
     }
 
     pub fn get_example_default_edge_map<E: Edge>() -> EdgeMap<E> {
-        let mut node_map = EdgeMap::<E>::new();
+        let mut edge_map = EdgeMap::<E>::new();
         for _ in 0..5 {
-            node_map.add(E::default());
+            edge_map.add(E::default());
         }
-        node_map.remove(&EdgeId(2)).unwrap();
-        node_map.remove(&EdgeId(3)).unwrap();
-        node_map
+        edge_map.remove(&EdgeId(2)).unwrap();
+        edge_map.remove(&EdgeId(3)).unwrap();
+        edge_map
     }
 
     pub fn get_example_non_default_edge_map<E: Edge>() -> EdgeMap<E> {
-        let mut node_map = EdgeMap::<E>::new();
-        node_map.add_from_nodes(NodeId(0), NodeId(0));
-        node_map.add_from_nodes(NodeId(0), NodeId(1));
-        node_map.add_from_nodes(NodeId(2), NodeId(1));
-        node_map.add_from_nodes(NodeId(2), NodeId(4));
-        node_map.add_from_nodes(NodeId(4), NodeId(0));
-        node_map.add_from_nodes(NodeId(4), NodeId(5));
-        node_map
+        let mut edge_map = EdgeMap::<E>::new();
+        edge_map.add_from_nodes(NodeId(0), NodeId(0));
+        edge_map.add_from_nodes(NodeId(0), NodeId(1));
+        edge_map.add_from_nodes(NodeId(2), NodeId(1));
+        edge_map.add_from_nodes(NodeId(2), NodeId(4));
+        edge_map.add_from_nodes(NodeId(4), NodeId(0));
+        edge_map.add_from_nodes(NodeId(4), NodeId(5));
+        edge_map
     }
 
     pub fn test_add_helper<E: Edge>() {

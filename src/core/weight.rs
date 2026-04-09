@@ -15,6 +15,6 @@ impl fmt::Debug for Weight {
 
 /// Use this trait if the node/edge should have be weighted.
 pub trait Weighted {
-    fn weight(&self) -> &Weight;
+    fn get_weight(&self) -> &Weight;
     fn set_weight(&mut self, weight: Weight);
 }

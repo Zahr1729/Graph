@@ -2,6 +2,7 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 
+use crate::core::node::Node;
 use crate::core::{edge::Edge, node::NodeId};
 use crate::core::weight::{Weight, Weighted};
 
@@ -11,6 +12,12 @@ pub struct WeightedEdge {
     first: NodeId,
     second: NodeId,
     weight: Weight,
+}
+
+impl WeightedEdge {
+    pub fn new(first: NodeId, second: NodeId, weight: Weight) -> Self {
+        Self {first, second, weight}
+    }
 }
 
 impl fmt::Debug for WeightedEdge {
@@ -36,15 +43,35 @@ impl Edge for WeightedEdge {
 }
 
 impl Weighted for WeightedEdge {
-    fn weight(&self) -> &Weight { &self.weight }
+    fn get_weight(&self) -> &Weight { &self.weight }
     fn set_weight(&mut self, weight: Weight) { self.weight = weight; }
 }
 
 #[cfg(test)]
-mod basic_edge_tests {
+mod weighted_edge_tests {
+    use crate::core::node::NodeId;
+    use crate::core::weight::{Weight, Weighted};
     use crate::graphs::weights::WeightedEdge;
 
-    use crate::core::edge::edge_tests::*;
+    use crate::core::edge::{Edge, EdgeMap, edge_tests::*};
+
+    fn get_weighted_edge_map<E: Edge + Weighted>() -> EdgeMap<E> {
+        let mut edge_map = EdgeMap::<E>::new();
+        for w in 0..3 {
+            let mut e = E::default();
+            e.set_weight(Weight(w));
+            edge_map.add(e);
+        }
+        return edge_map;
+    }
+    
+    #[test]
+    fn test_weights() {
+        let mut edge = WeightedEdge::new(NodeId(0), NodeId(1), Weight(2));
+        assert_eq!(edge.get_weight(), &Weight(2));
+        edge.set_weight(Weight(9));
+        assert_eq!(edge.get_weight(), &Weight(9));
+    }
 
     #[test]
     fn test_add() {
@@ -77,15 +104,12 @@ mod basic_edge_tests {
 
     #[test]
     fn test_debug() {
-        let edge_map = get_example_default_edge_map::<WeightedEdge>();
-        assert_eq!(format!("{edge_map:?}"), "Edges: [[0, 0]: 0, [0, 0]: 0, [0, 0]: 0]");
-
-        let second_edge_map = get_example_non_default_edge_map::<WeightedEdge>();
-        assert_eq!(format!("{second_edge_map:?}"), "Edges: [[0, 0]: 0, [0, 1]: 0, [2, 1]: 0, [2, 4]: 0, [4, 0]: 0, [4, 5]: 0]");
+        let edge_map = get_weighted_edge_map::<WeightedEdge>();
+        assert_eq!(format!("{edge_map:?}"), "Edges: [[0, 0]: 0, [0, 0]: 1, [0, 0]: 2]");
     }
 }
 
-mod basic_graph_tests {
+mod weighted_graph_tests {
     use crate::core::graph::graph_tests::*;
 
     use crate::graphs::{basic::BasicNode, weights::WeightedEdge};
