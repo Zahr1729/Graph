@@ -259,14 +259,6 @@ pub(crate) mod graph_tests {
         assert!(graph.remove_edge(&EdgeId(8)).is_none());
     }
 
-    // Test debug
-
-    pub fn test_debug_helper<N: Node, E: Edge>() {
-        let node_map = get_example_graph::<N, E>();
-        assert_eq!(format!("{node_map:?}"),
-        "Graph { Nodes: [0, 1, 2, 4, 5, 6], Edges: [[0, 0], [0, 1], [0, 2], [1, 4], [2, 5], [4, 6], [5, 1]] }");
-    }
-
     // test serde
 
     pub fn test_serde_helper<N: Node + Serialize + for<'a> Deserialize<'a>, E: Edge + Serialize + for<'a> Deserialize<'a>>() {

@@ -4,7 +4,7 @@ mod graphs;
 
 use std::path::Path;
 
-use crate::{core::{edge::{Edge, EdgeMap}, graph::Graph, node::{Node, NodeId, NodeMap}}, graphs::basic::{BasicEdge, BasicNode}};
+use crate::{core::{edge::{Edge, EdgeMap}, graph::Graph, node::{Node, NodeId, NodeMap}}, graphs::{basic::{BasicEdge, BasicNode}, weights::WeightedEdge}};
 use crate::utils::saveload::{load_from_json, save_to_json};
 
 // Duplicate code to testing.
@@ -27,6 +27,6 @@ fn get_example_graph<N: Node, E: Edge>() -> Graph<N, E> {
 pub fn main() {
     // let g = get_example_graph::<BasicNode, BasicEdge>();
     // let _ = save_to_json(Path::new("./data/graph.json"), &g);
-    let g: Graph<BasicNode, BasicEdge> = load_from_json(Path::new("./data/graph.json")).unwrap();
+    let g: Graph<BasicNode, WeightedEdge> = load_from_json(Path::new("./tests/data/save-load.json")).unwrap();
     println!("{:?}", g);
 }

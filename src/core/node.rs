@@ -147,9 +147,4 @@ pub(crate) mod node_tests {
         assert!(ret0.is_some());
         assert_eq!(node_map.len(), 4);
     }
-
-    pub fn test_debug_helper<N: Node + Default>() {
-        let node_map = get_example_node_map::<N>();
-        assert_eq!(format!("{node_map:?}"), "Nodes: [0, 1, 4]")
-    }
 }

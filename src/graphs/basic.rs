@@ -71,7 +71,8 @@ mod basic_node_tests {
 
     #[test]
     fn test_debug() {
-        test_debug_helper::<BasicNode>();
+        let node_map = get_example_node_map::<BasicNode>();
+        assert_eq!(format!("{node_map:?}"), "Nodes: [0, 1, 4]")
     }
 }
 
@@ -112,7 +113,11 @@ mod basic_edge_tests {
 
     #[test]
     fn test_debug() {
-        test_debug_helper::<BasicEdge>();
+        let edge_map = get_example_default_edge_map::<BasicEdge>();
+        assert_eq!(format!("{edge_map:?}"), "Edges: [[0, 0], [0, 0], [0, 0]]");
+
+        let second_edge_map = get_example_non_default_edge_map::<BasicEdge>();
+        assert_eq!(format!("{second_edge_map:?}"), "Edges: [[0, 0], [0, 1], [2, 1], [2, 4], [4, 0], [4, 5]]");
     }
 }
 
@@ -173,7 +178,9 @@ mod basic_graph_tests {
 
     #[test]
     fn test_debug() {
-        test_debug_helper::<BasicNode, BasicEdge>();
+        let graph = get_example_graph::<BasicNode, BasicEdge>();
+        assert_eq!(format!("{graph:?}"),
+        "Graph { Nodes: [0, 1, 2, 4, 5, 6], Edges: [[0, 0], [0, 1], [0, 2], [1, 4], [2, 5], [4, 6], [5, 1]] }");
     }
 
     #[test]

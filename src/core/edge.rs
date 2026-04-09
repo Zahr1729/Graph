@@ -240,12 +240,4 @@ pub(crate) mod edge_tests {
         assert!(ret0.is_some());
         assert_eq!(edge_map.len(), 4);
     }
-
-    pub fn test_debug_helper<E: Edge>() {
-        let edge_map = get_example_default_edge_map::<E>();
-        assert_eq!(format!("{edge_map:?}"), "Edges: [[0, 0], [0, 0], [0, 0]]");
-
-        let second_edge_map = get_example_non_default_edge_map::<E>();
-        assert_eq!(format!("{second_edge_map:?}"), "Edges: [[0, 0], [0, 1], [2, 1], [2, 4], [4, 0], [4, 5]]");
-    }
 }
