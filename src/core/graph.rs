@@ -83,13 +83,27 @@ impl<N: Node, E: Edge> Graph<N, E> {
         vec
     }
 
-    pub fn get_neighbors(&self, node_id: &NodeId) -> Vec<&NodeId> {
+    /// Get all a nodes neighbours without considering parity.
+    pub fn get_neighbors(&self, node_id: &NodeId) -> Vec<(&EdgeId, &NodeId)> {
         let edges = self.get_edges(node_id);
         let mut set = HashSet::new();
         for edge_id in edges {
             let edge = self.get_edge(edge_id).unwrap();
-            let arg = if edge.get_second() == node_id { edge.get_first() } else { edge.get_second() };
-            set.insert(arg);
+            let node_id = if edge.get_second() == node_id { edge.get_first() } else { edge.get_second() };
+            set.insert((edge_id, node_id));
+        }
+        set.into_iter().collect::<Vec<_>>()
+    }
+
+    /// Get all a nodes neighbours where we travel from first to second.
+    pub fn get_directed_neighbors(&self, node_id: &NodeId) -> Vec<(&EdgeId, &NodeId)> {
+        let edges = self.get_edges(node_id);
+        let mut set = HashSet::new();
+        for edge_id in edges {
+            let edge = self.get_edge(edge_id).unwrap();
+            let (id, other) = edge.get_nodes();
+            if id != node_id { continue; }
+            set.insert((edge_id, other));
         }
         set.into_iter().collect::<Vec<_>>()
     }
@@ -276,9 +290,22 @@ pub(crate) mod graph_tests {
 
         let one_neighbours = graph.get_neighbors(&NodeId(1));
 
-        assert!(one_neighbours.contains(&&NodeId(0)));
-        assert!(one_neighbours.contains(&&NodeId(4)));
-        assert!(one_neighbours.contains(&&NodeId(5)));
+        assert_eq!(one_neighbours.len(), 3);
+        assert!(one_neighbours.contains(&(&EdgeId(1), &NodeId(0))));
+        assert!(one_neighbours.contains(&(&EdgeId(7), &NodeId(4))));
+        assert!(one_neighbours.contains(&(&EdgeId(5), &NodeId(5))));
+    }
+
+    pub fn test_get_directed_neighbors_helper<N: Node, E: Edge>() {
+        let graph = get_example_graph::<N, E>();
+        assert_eq!(graph.get_directed_neighbors(&NodeId(0)).len(), 3);
+        assert_eq!(graph.get_directed_neighbors(&NodeId(1)).len(), 1);
+        assert_eq!(graph.get_directed_neighbors(&NodeId(2)).len(), 1);
+
+        let one_neighbours = graph.get_directed_neighbors(&NodeId(1));
+
+        assert_eq!(one_neighbours.len(), 1);
+        assert!(one_neighbours.contains(&(&EdgeId(7), &NodeId(4))));
     }
 
     // Insert

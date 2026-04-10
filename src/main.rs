@@ -1,6 +1,7 @@
 mod core;
 mod utils;
 mod graphs;
+mod algorithms;
 
 use std::path::Path;
 

@@ -177,6 +177,11 @@ mod basic_graph_tests {
     }
 
     #[test]
+    fn test_get_directed_neighbors() {
+        test_get_directed_neighbors_helper::<BasicNode, BasicEdge>();
+    }
+
+    #[test]
     fn test_insert_node() {
         test_insert_node_helper::<BasicNode, BasicEdge>();
     }
