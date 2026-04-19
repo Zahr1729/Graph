@@ -65,6 +65,7 @@ impl<N: Node, E: Edge> Graph<N, E> {
         self.edge_map.get(edge_id)
     }
 
+    // TODO: Change this to support both keys and values
     pub fn nodes(&self) -> Vec<&NodeId> {
         self.node_map.node_map.keys().into_iter().collect::<Vec<_>>()
     }
@@ -352,8 +353,8 @@ pub(crate) mod graph_tests {
 
     // test serde
 
-    pub fn test_serde_helper<N: Node + Serialize + for<'a> Deserialize<'a>, E: Edge + Serialize + for<'a> Deserialize<'a>>() {
-        let path = Path::new("./tests/data/save-load.json");
+    pub fn test_serde_helper<N: Node + Serialize + for<'a> Deserialize<'a>, E: Edge + Serialize + for<'a> Deserialize<'a>>(file_name: &'static str) {
+        let path = Path::new(file_name);
         let g = get_example_graph::<N, E>();
         let initial_debug = format!("{:?}", g);
 

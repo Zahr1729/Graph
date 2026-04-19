@@ -44,13 +44,11 @@ impl<N: Node, E: Edge> Graph<N,E> {
             true => Some((path_stack, visited_nodes)),
             false => None,
         }
-        
-        
     }
 }
 
 #[cfg(test)]
-mod test_dfs {
+mod dfs_tests {
     use crate::{core::{edge::{Edge, EdgeId}, graph::{Graph, graph_tests::get_example_graph}, node::{Node, NodeId}}, graphs::basic::{BasicEdge, BasicNode}};
 
     #[test]

@@ -2,25 +2,20 @@
   "node_map": {
     "node_counter": 7,
     "node_map": {
+      "6": [],
       "0": [],
       "1": [],
-      "5": [],
-      "4": [],
       "2": [],
-      "6": []
+      "4": [],
+      "5": []
     }
   },
   "edge_map": {
     "edge_counter": 8,
     "edge_map": {
-      "6": {
-        "first": 4,
-        "second": 6,
-        "weight": 0
-      },
-      "2": {
-        "first": 0,
-        "second": 2,
+      "7": {
+        "first": 1,
+        "second": 4,
         "weight": 0
       },
       "4": {
@@ -28,24 +23,29 @@
         "second": 5,
         "weight": 0
       },
-      "0": {
-        "first": 0,
-        "second": 0,
-        "weight": 0
-      },
-      "7": {
-        "first": 1,
-        "second": 4,
-        "weight": 0
-      },
       "1": {
         "first": 0,
         "second": 1,
         "weight": 0
       },
+      "2": {
+        "first": 0,
+        "second": 2,
+        "weight": 0
+      },
+      "0": {
+        "first": 0,
+        "second": 0,
+        "weight": 0
+      },
       "5": {
         "first": 5,
         "second": 1,
+        "weight": 0
+      },
+      "6": {
+        "first": 4,
+        "second": 6,
         "weight": 0
       }
     }

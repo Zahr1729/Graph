@@ -198,6 +198,6 @@ mod weighted_graph_tests {
 
     #[test]
     fn test_serde() {
-        test_serde_helper::<BasicNode, WeightedEdge>();
+        test_serde_helper::<BasicNode, WeightedEdge>("./tests/data/save_load/weights.json");
     }
 }

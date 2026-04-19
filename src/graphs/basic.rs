@@ -210,6 +210,6 @@ mod basic_graph_tests {
 
     #[test]
     fn test_serde() {
-        test_serde_helper::<BasicNode, BasicEdge>();
+        test_serde_helper::<BasicNode, BasicEdge>("./tests/data/save_load/basic.json");
     }
 }

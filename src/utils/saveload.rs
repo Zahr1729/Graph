@@ -17,7 +17,9 @@ pub fn save_to_json<'a, T: Serialize>(file_path: &'a Path, data: &'a T) -> Resul
 pub fn load_from_json<T: for<'a> Deserialize<'a>>(file_path: &'_ Path) -> Result<T, IoError<'_>>{
     let e = Err(IoError::ReadError { path: file_path });
     let Ok(file) = File::open(file_path) else { return e };
+    println!("WAAAAAAAAAAAA");
     let mut reader = BufReader::new(file);
+    println!("WAAAAAAAAAAAA");
     let Ok(data) = serde_json::from_reader(&mut reader) else { return e };
     Ok(data)
 }
