@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::core::node::Node;
 use crate::core::{edge::Edge, node::NodeId};
 use crate::core::weight::{Weight, Weighted};
+use crate::utils::new_trait::ENew;
 
 /// An Edge at minimum needs a reference to two nodes.
 #[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -42,6 +43,12 @@ impl Edge for WeightedEdge {
     }
 }
 
+impl ENew for WeightedEdge {
+    fn new(first: NodeId, second: NodeId) -> Self {
+        Self {first: first, second: second, weight: Weight(0), }
+    }
+}
+
 impl Weighted for WeightedEdge {
     fn get_weight(&self) -> &Weight { &self.weight }
     fn set_weight(&mut self, weight: Weight) { self.weight = weight; }
@@ -54,8 +61,9 @@ mod weighted_edge_tests {
     use crate::graphs::weights::WeightedEdge;
 
     use crate::core::edge::{Edge, EdgeMap, edge_tests::*};
+    use crate::utils::new_trait::ENew;
 
-    fn get_weighted_edge_map<E: Edge + Weighted>() -> EdgeMap<E> {
+    fn get_weighted_edge_map<E: Edge + Weighted + ENew>() -> EdgeMap<E> {
         let mut edge_map = EdgeMap::<E>::new();
         for w in 0..3 {
             let mut e = E::default();

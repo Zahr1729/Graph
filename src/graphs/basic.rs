@@ -2,18 +2,18 @@ use std::fmt::{self, Debug};
 
 use serde::{Serialize, Deserialize};
 
-use crate::core::{edge::Edge, node::{Node, NodeId}};
+use crate::{core::{edge::Edge, node::{Node, NodeId}}, utils::new_trait::{ENew, NNew}};
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct BasicNode();
 
-impl Node for BasicNode {
+impl Node for BasicNode {}
+
+impl NNew for BasicNode {
     fn new() -> Self {
-        Self()
+        Self {}
     }
 }
-
-
 
 /// An Edge at minimum needs a reference to two nodes.
 #[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -38,9 +38,14 @@ impl Edge for BasicEdge {
     fn get_second(&self) -> &NodeId { &self.second }
     fn set_first(&mut self, node_id: NodeId) { self.first = node_id }
     fn set_second(&mut self, node_id: NodeId) { self.second = node_id }
-    
     fn dbg(&self) -> impl Debug {
         BasicEdge{first:self.get_first().clone(), second:self.get_second().clone()};
+    }
+}
+
+impl ENew for BasicEdge {
+    fn new(first: NodeId, second: NodeId) -> Self {
+        Self {first: first, second: second,}
     }
 }
 

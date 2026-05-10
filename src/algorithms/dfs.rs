@@ -49,7 +49,7 @@ impl<N: Node, E: Edge> Graph<N,E> {
 
 #[cfg(test)]
 mod dfs_tests {
-    use crate::{core::{edge::{Edge, EdgeId}, graph::{Graph, graph_tests::get_example_graph}, node::{Node, NodeId}}, graphs::basic::{BasicEdge, BasicNode}};
+    use crate::{core::{edge::{Edge, EdgeId}, graph::{Graph, graph_tests::get_example_graph}, node::{Node, NodeId}}, graphs::basic::{BasicEdge, BasicNode}, utils::new_trait::{ENew, NNew}};
 
     #[test]
     fn test_dfs_success() {

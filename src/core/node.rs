@@ -15,9 +15,7 @@ impl fmt::Debug for NodeId {
 }
 
 /// Anything that behaves like a node, which is everything.
-pub trait Node {
-    fn new() -> Self;
-}
+pub trait Node {}
 
 /// Structure to deal with storing nodes in a graph.
 #[derive(Serialize, Deserialize)]

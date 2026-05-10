@@ -2,7 +2,7 @@ use std::fmt::{self, Debug};
 
 use serde::{Serialize, Deserialize};
 
-use crate::core::{edge::Edge, node::{Node, NodeId}};
+use crate::{core::{edge::Edge, node::{Node, NodeId}}, utils::new_trait::NNew};
 
 
 pub trait Coords2d {
@@ -25,6 +25,9 @@ pub struct CoordNode {
 }
 
 impl Node for CoordNode {
+}
+
+impl NNew for CoordNode {
     fn new() -> Self {
         Self { x: 0.0, y: 0.0 }
     }
