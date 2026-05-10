@@ -3,6 +3,10 @@ name = "graph"
 version = "0.1.0"
 edition = "2024"
 
+# Example of customizing the library in Cargo.toml.
+[lib]
+crate-type = ["cdylib"]
+
 [dependencies]
 macroquad = "0.4.14"
 proptest = "1.11.0"
