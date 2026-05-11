@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::{core::{edge::Edge, node::{Node, NodeId}}, utils::new_trait::{ENew, NNew}};
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize, Copy, Clone)]
 pub struct BasicNode();
 
 impl Node for BasicNode {}
@@ -16,7 +16,7 @@ impl NNew for BasicNode {
 }
 
 /// An Edge at minimum needs a reference to two nodes.
-#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Copy, Clone)]
 pub struct BasicEdge {
     first: NodeId,
     second: NodeId,

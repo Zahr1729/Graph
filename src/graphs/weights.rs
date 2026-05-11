@@ -8,7 +8,7 @@ use crate::core::weight::{Weight, Weighted};
 use crate::utils::new_trait::ENew;
 
 /// An Edge at minimum needs a reference to two nodes.
-#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Clone, Copy)]
 pub struct WeightedEdge {
     first: NodeId,
     second: NodeId,

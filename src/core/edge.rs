@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::{core::{error::GraphError, node::NodeId}, utils::new_trait::ENew};
 
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Default, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Default, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct EdgeId(pub usize);
 
 
@@ -42,7 +42,7 @@ pub trait Edge: Ord + Debug {
 
 
 /// Structure to deal with storing nodes in a graph.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct EdgeMap<E: Edge>{
     edge_counter: usize,
     pub edge_map: HashMap<EdgeId, E>,

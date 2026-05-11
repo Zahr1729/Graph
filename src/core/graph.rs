@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet}, fmt};
+use std::{collections::{HashSet}, fmt};
 
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +10,7 @@ use crate::core::edge::{Edge, EdgeId, EdgeMap};
 
 
 /// Generic Graph structure.
-# [derive(Serialize, Deserialize)]
+# [derive(Serialize, Deserialize, Clone)]
 pub struct Graph<N: Node, E: Edge> {
     pub(crate) node_map: NodeMap<N>,
     pub(crate) edge_map: EdgeMap<E>,

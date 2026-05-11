@@ -18,7 +18,7 @@ pub trait Coords2d {
 }
 
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone, Copy)]
 pub struct CoordNode {
     x: f32,
     y: f32,

@@ -18,7 +18,7 @@ impl fmt::Debug for NodeId {
 pub trait Node {}
 
 /// Structure to deal with storing nodes in a graph.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct NodeMap<N: Node>{
     node_counter: usize,
     pub node_map: HashMap<NodeId, N>,
