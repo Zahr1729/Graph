@@ -58,13 +58,30 @@ impl<N: Node, E: Edge> Graph<N, E> {
         self.edge_map.get(edge_id)
     }
 
-    // TODO: Change this to support both keys and values
+    /// Get node corresponding to node id
+    pub fn get_mut_node(&mut self, node_id: &NodeId) -> Result<&mut N, GraphError> {
+        self.node_map.get_mut(node_id)
+    }
+
+    /// Get edge corresponding to edge id
+    pub fn get_mut_edge(&mut self, edge_id: &EdgeId) -> Result<&mut E, GraphError> {
+        self.edge_map.get_mut(edge_id)
+    }
+
     pub fn nodes(&self) -> Vec<(&NodeId, &N)> {
-        self.node_map.node_map.keys().into_iter().map(|id| {(id, self.get_node(id).unwrap())}).collect::<Vec<_>>()
+        self.node_map.node_map.iter().collect::<Vec<_>>()
     }
 
     pub fn edges(&self) -> Vec<(&EdgeId, &E)> {
-        self.edge_map.edge_map.keys().into_iter().map(|id| {(id, self.get_edge(id).unwrap())}).collect::<Vec<_>>()
+        self.edge_map.edge_map.iter().collect::<Vec<_>>()
+    }
+
+    pub fn nodes_mut(&mut self) -> Vec<(&NodeId, &mut N)> {
+        self.node_map.node_map.iter_mut().collect::<Vec<_>>()
+    }
+
+    pub fn edges_mut(&mut self) -> Vec<(&EdgeId, &mut E)> {
+        self.edge_map.edge_map.iter_mut().collect::<Vec<_>>()
     }
 
     pub fn get_edges(&self, node_id: &NodeId) -> Vec<&EdgeId> {

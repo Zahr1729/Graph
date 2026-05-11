@@ -48,7 +48,15 @@ impl<N: Node> NodeMap<N> {
     pub fn get(&self, node_id: &NodeId) -> Result<&N, GraphError> {
         match self.node_map.get(node_id) {
             None => return Err(GraphError::NodeNotFoundError { id: node_id.clone() }),
-            Some(node) => Ok(&node),
+            Some(node) => Ok(node),
+        }
+    }
+
+    /// Get mutable node corresponding to node id
+    pub fn get_mut(&mut self, node_id: &NodeId) -> Result<&mut N, GraphError> {
+        match self.node_map.get_mut(node_id) {
+            None => return Err(GraphError::NodeNotFoundError { id: node_id.clone() }),
+            Some(node) => Ok(node),
         }
     }
 

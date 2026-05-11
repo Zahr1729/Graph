@@ -77,6 +77,14 @@ impl<E: Edge> EdgeMap<E> {
         }
     }
 
+    /// Get mutable edge corresponding to edge id
+    pub fn get_mut(&mut self, edge_id: &EdgeId) -> Result<&mut E, GraphError> {
+        match self.edge_map.get_mut(edge_id) {
+            None => return Err(GraphError::EdgeNotFoundError { id: edge_id.clone() }),
+            Some(edge) => Ok(edge),
+        }
+    }
+
     /// Attempt to remove edge from graph
     pub fn remove(&mut self, edge_id: &EdgeId) -> Option<E> {
         self.edge_map.remove(edge_id)
