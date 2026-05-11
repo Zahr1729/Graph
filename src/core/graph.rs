@@ -84,22 +84,20 @@ impl<N: Node, E: Edge> Graph<N, E> {
         self.edge_map.edge_map.iter_mut().collect::<Vec<_>>()
     }
 
-    pub fn get_edges(&self, node_id: &NodeId) -> Vec<&EdgeId> {
+    pub fn get_edges_from_neighbours(&self, node_id: &NodeId) -> Vec<(&EdgeId, &E)> {
         let all_edges = self.edges();
         let mut vec = vec![];
-        for (edge_id, _) in all_edges {
-            let edge = self.get_edge(edge_id).unwrap();
-            if edge.contains_node(node_id) {vec.push(edge_id);}
+        for (id, e) in all_edges {
+            if e.contains_node(node_id) {vec.push((id, e));}
         }
         vec
     }
 
     /// Get all a nodes neighbours without considering parity.
     pub fn get_neighbors(&self, node_id: &NodeId) -> Vec<(&EdgeId, &NodeId)> {
-        let edges = self.get_edges(node_id);
+        let edges = self.get_edges_from_neighbours(node_id);
         let mut set = HashSet::new();
-        for edge_id in edges {
-            let edge = self.get_edge(&edge_id).unwrap();
+        for (edge_id, edge) in edges {
             let node_id = if edge.get_second() == node_id { edge.get_first() } else { edge.get_second() };
             set.insert((edge_id, node_id));
         }
@@ -108,10 +106,9 @@ impl<N: Node, E: Edge> Graph<N, E> {
 
     /// Get all a nodes neighbours where we travel from first to second.
     pub fn get_directed_neighbors(&self, node_id: &NodeId) -> Vec<(&EdgeId, &NodeId)> {
-        let edges = self.get_edges(node_id);
+        let edges = self.get_edges_from_neighbours(node_id);
         let mut set = HashSet::new();
-        for edge_id in edges {
-            let edge = self.get_edge(edge_id).unwrap();
+        for (edge_id, edge) in edges {
             let (id, other) = edge.get_nodes();
             if id != node_id { continue; }
             set.insert((edge_id, other));
@@ -292,14 +289,14 @@ pub(crate) mod graph_tests {
 
     pub fn test_get_edges_helper<N: Node + NNew, E: Edge + ENew>() {
         let graph = get_example_graph::<N, E>();
-        assert_eq!(graph.get_edges(&NodeId(0)).len(), 3);
-        assert_eq!(graph.get_edges(&NodeId(1)).len(), 3);
-        assert_eq!(graph.get_edges(&NodeId(2)).len(), 2);
-        assert_eq!(graph.get_edges(&NodeId(3)).len(), 0);
-        assert_eq!(graph.get_edges(&NodeId(4)).len(), 2);
-        assert_eq!(graph.get_edges(&NodeId(5)).len(), 2);
-        assert_eq!(graph.get_edges(&NodeId(6)).len(), 1);
-        assert_eq!(graph.get_edges(&NodeId(7)).len(), 0);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(0)).len(), 3);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(1)).len(), 3);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(2)).len(), 2);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(3)).len(), 0);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(4)).len(), 2);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(5)).len(), 2);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(6)).len(), 1);
+        assert_eq!(graph.get_edges_from_neighbours(&NodeId(7)).len(), 0);
     }
 
     pub fn test_get_neighbors_helper<N: Node + NNew, E: Edge + ENew>() {
