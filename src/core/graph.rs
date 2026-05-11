@@ -59,18 +59,18 @@ impl<N: Node, E: Edge> Graph<N, E> {
     }
 
     // TODO: Change this to support both keys and values
-    pub fn nodes(&self) -> Vec<&NodeId> {
-        self.node_map.node_map.keys().into_iter().collect::<Vec<_>>()
+    pub fn nodes(&self) -> Vec<(&NodeId, &N)> {
+        self.node_map.node_map.keys().into_iter().map(|id| {(id, self.get_node(id).unwrap())}).collect::<Vec<_>>()
     }
 
-    pub fn edges(&self) -> Vec<&EdgeId> {
-        self.edge_map.edge_map.keys().into_iter().collect::<Vec<_>>()
+    pub fn edges(&self) -> Vec<(&EdgeId, &E)> {
+        self.edge_map.edge_map.keys().into_iter().map(|id| {(id, self.get_edge(id).unwrap())}).collect::<Vec<_>>()
     }
 
     pub fn get_edges(&self, node_id: &NodeId) -> Vec<&EdgeId> {
         let all_edges = self.edges();
         let mut vec = vec![];
-        for edge_id in all_edges {
+        for (edge_id, _) in all_edges {
             let edge = self.get_edge(edge_id).unwrap();
             if edge.contains_node(node_id) {vec.push(edge_id);}
         }
@@ -82,7 +82,7 @@ impl<N: Node, E: Edge> Graph<N, E> {
         let edges = self.get_edges(node_id);
         let mut set = HashSet::new();
         for edge_id in edges {
-            let edge = self.get_edge(edge_id).unwrap();
+            let edge = self.get_edge(&edge_id).unwrap();
             let node_id = if edge.get_second() == node_id { edge.get_first() } else { edge.get_second() };
             set.insert((edge_id, node_id));
         }
