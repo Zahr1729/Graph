@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt};
+use std::{collections::HashMap, fmt::{self, Debug}, ops::Add};
 
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +15,7 @@ impl fmt::Debug for NodeId {
 }
 
 /// Anything that behaves like a node, which is everything.
-pub trait Node {}
+pub trait Node: Debug {}
 
 /// Structure to deal with storing nodes in a graph.
 #[derive(Serialize, Deserialize, Clone)]
@@ -71,9 +71,10 @@ impl<N: Node> NodeMap<N> {
 
 impl<N: Node> fmt::Debug for NodeMap<N> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut node_vec = self.node_map.keys().into_iter().collect::<Vec<_>>();
-        node_vec.sort();
-        write!(f, "Nodes: {:?}", &node_vec)?;
+        let mut unsorted = self.node_map.keys().copied().collect::<Vec<_>>();
+        unsorted.sort();
+        let sorted = unsorted.into_iter().map(|id| {(id, self.node_map.get(&id).unwrap())}).collect::<Vec<_>>();
+        write!(f, "Nodes: {:?}", sorted)?;
         Ok(())
     }
 }

@@ -24,7 +24,7 @@ impl fmt::Debug for EdgeId {
 }
 
 /// Anything that behaves like a node, which is everything.
-pub trait Edge: Ord + Debug {
+pub trait Edge: Debug {
     fn contains_node(&self, node_id: &NodeId) -> bool;
     fn get_first(&self) -> &NodeId;
     fn get_second(&self) -> &NodeId;
@@ -37,7 +37,6 @@ pub trait Edge: Ord + Debug {
         self.set_first(first);
         self.set_second(second);
     }
-    fn dbg(&self) -> impl Debug;
 }
 
 
@@ -120,9 +119,10 @@ impl <E: Edge + ENew> EdgeMap<E> {
 
 impl<E: Edge> fmt::Debug for EdgeMap<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut edge_vec = self.edge_map.values().into_iter().collect::<Vec<_>>();
-        edge_vec.sort();
-        write!(f, "Edges: {:?}", &edge_vec)?;
+        let mut unsorted = self.edge_map.keys().copied().collect::<Vec<_>>();
+        unsorted.sort();
+        let sorted = unsorted.into_iter().map(|id| {(id, self.edge_map.get(&id).unwrap())}).collect::<Vec<_>>();
+        write!(f, "Edges: {:?}", sorted)?;
         Ok(())
     }
 }

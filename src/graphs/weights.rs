@@ -23,7 +23,7 @@ impl WeightedEdge {
 
 impl fmt::Debug for WeightedEdge {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{:?}, {:?}]: {:?}", self.first, self.second, self.weight)?;
+        write!(f, "{{ [{:?}, {:?}], {:?} }}", self.first, self.second, self.weight)?;
         Ok(())
     }
 }
@@ -37,10 +37,6 @@ impl Edge for WeightedEdge {
     fn get_second(&self) -> &NodeId { &self.second }
     fn set_first(&mut self, node_id: NodeId) { self.first = node_id }
     fn set_second(&mut self, node_id: NodeId) { self.second = node_id }
-    
-    fn dbg(&self) -> impl std::fmt::Debug {
-        self
-    }
 }
 
 impl ENew for WeightedEdge {
@@ -113,7 +109,7 @@ mod weighted_edge_tests {
     #[test]
     fn test_debug() {
         let edge_map = get_weighted_edge_map::<WeightedEdge>();
-        assert_eq!(format!("{edge_map:?}"), "Edges: [[0, 0]: 0, [0, 0]: 1, [0, 0]: 2]");
+        assert_eq!(format!("{edge_map:?}"), "Edges: [(0, { [0, 0], 0 }), (1, { [0, 0], 1 }), (2, { [0, 0], 2 })]");
     }
 }
 
@@ -201,7 +197,7 @@ mod weighted_graph_tests {
     fn test_debug() {
         let graph = get_example_graph::<BasicNode, WeightedEdge>();
         assert_eq!(format!("{graph:?}"),
-        "Graph { Nodes: [0, 1, 2, 4, 5, 6], Edges: [[0, 0]: 0, [0, 1]: 0, [0, 2]: 0, [1, 4]: 0, [2, 5]: 0, [4, 6]: 0, [5, 1]: 0] }");
+        "Graph { Nodes: [(0, {}), (1, {}), (2, {}), (4, {}), (5, {}), (6, {})], Edges: [(0, { [0, 0], 0 }), (1, { [0, 1], 0 }), (2, { [0, 2], 0 }), (4, { [2, 5], 0 }), (5, { [5, 1], 0 }), (6, { [4, 6], 0 }), (7, { [1, 4], 0 })] }");
     }
 
     #[test]

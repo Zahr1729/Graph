@@ -69,7 +69,7 @@ mod location_node_tests {
     #[test]
     fn test_debug() {
         let node_map = get_example_node_map::<CoordNode>();
-        assert_eq!(format!("{node_map:?}"), "Nodes: [0, 1, 4]")
+        assert_eq!(format!("{node_map:?}"), "Nodes: [(0, CoordNode { x: 0.0, y: 0.0 }), (1, CoordNode { x: 0.0, y: 0.0 }), (4, CoordNode { x: 0.0, y: 0.0 })]")
     }
 
     #[test]
