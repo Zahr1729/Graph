@@ -8,7 +8,7 @@ use crate::core::edge::{Edge, EdgeId, EdgeMap};
 
 // /// For a generic graph let us have a map which takes node/edge id (stored as an int) and returns
 
-pub trait IGraph<N: Node, E: Edge> {
+pub trait Graph<N: Node, E: Edge> {
     // Add
     fn add_node(&mut self, node: N) -> NodeId;
     fn unsafe_add_edge(&mut self, edge: E) -> EdgeId;
@@ -101,151 +101,6 @@ pub trait IGraph<N: Node, E: Edge> {
     fn verify_edge(&self, new_edge: &E) -> Result<(), GraphError>;
     fn verify(&self) -> Result<(), GraphError>;
 }
-/// Generic Graph structure.
-# [derive(Serialize, Deserialize, Clone)]
-pub struct Graph<N: Node, E: Edge> {
-    pub(crate) node_map: NodeMap<N>,
-    pub(crate) edge_map: EdgeMap<E>,
-}
-
-impl<N: Node, E: Edge> Graph<N, E> {
-    pub fn new() -> Self {
-        Self {
-            node_map: NodeMap::<N>::new(),
-            edge_map: EdgeMap::<E>::new()
-        }
-    }
-}
-
-impl<N: Node, E: Edge> IGraph<N, E> for Graph<N, E> {
-    fn get_node_ids(&self) -> Vec<&NodeId> {
-        self.node_map.node_map.keys().into_iter().collect::<Vec<_>>()
-    }
-
-    fn get_edge_ids(&self) -> Vec<&EdgeId> {
-        self.edge_map.edge_map.keys().into_iter().collect::<Vec<_>>()
-    }
-
-    /// Add node
-    fn add_node(&mut self, node: N) -> NodeId {
-        self.node_map.add(node)
-    }
-
-    /// Add edge without checking if it is valid
-    fn unsafe_add_edge(&mut self, edge: E) -> EdgeId {
-        self.edge_map.add(edge)
-    }
-
-    /// Get node corresponding to node id
-    fn get_node(&self, node_id: &NodeId) -> Result<&N, GraphError> {
-        self.node_map.get(node_id)
-    }
-
-    /// Get edge corresponding to edge id
-    fn get_edge(&self, edge_id: &EdgeId) -> Result<&E, GraphError> {
-        self.edge_map.get(edge_id)
-    }
-
-    /// Get node corresponding to node id
-    fn get_mut_node(&mut self, node_id: &NodeId) -> Result<&mut N, GraphError> {
-        self.node_map.get_mut(node_id)
-    }
-
-    /// Get edge corresponding to edge id
-    fn get_mut_edge(&mut self, edge_id: &EdgeId) -> Result<&mut E, GraphError> {
-        self.edge_map.get_mut(edge_id)
-    }
-
-    fn nodes(&self) -> Vec<(&NodeId, &N)> {
-        self.node_map.node_map.iter().collect::<Vec<_>>()
-    }
-
-    fn edges(&self) -> Vec<(&EdgeId, &E)> {
-        self.edge_map.edge_map.iter().collect::<Vec<_>>()
-    }
-
-    fn nodes_mut(&mut self) -> Vec<(&NodeId, &mut N)> {
-        self.node_map.node_map.iter_mut().collect::<Vec<_>>()
-    }
-
-    fn edges_mut(&mut self) -> Vec<(&EdgeId, &mut E)> {
-        self.edge_map.edge_map.iter_mut().collect::<Vec<_>>()
-    }
-
-    /// Insert node
-    fn insert_node(&mut self, node_id: NodeId, node: N) -> Option<N> {
-        self.node_map.insert(node_id, node)
-    }
-
-    /// Insert edge
-    fn insert_edge(&mut self, edge_id: EdgeId, edge: E) -> Option<E> {
-        self.edge_map.insert(edge_id, edge)
-    }
-
-    /// Remove node from graph
-    fn remove_node(&mut self, node_id: &NodeId) -> Option<N> {
-        self.edge_map.remove_edges_dependent_on_node(node_id);
-        self.node_map.remove(node_id)
-    }
-
-    /// Remove edge from graph
-    fn remove_edge(&mut self, edge_id: &EdgeId) -> Option<E> {
-        self.edge_map.remove(edge_id)
-    }
-
-    /// Verify node is in graph
-    fn verify_node(&self, node_id: &NodeId) -> Result<(), GraphError> {
-        self.node_map.verify_node(node_id)
-    }
-
-    /// Verify edge is in graph and well defined.
-    fn verify_edge_id(&self, edge_id: &EdgeId) -> Result<(), GraphError> {
-        self.edge_map.verify(edge_id)?;
-        let edge = self.get_edge(edge_id).unwrap();
-        // Verify that the nodes in the edge are part of the graph.
-        self.verify_node(edge.get_first())?;
-        self.verify_node(edge.get_first())?;
-        Ok(())
-    }
-
-    /// Verify edge is well defined in the graph
-    fn verify_edge(&self, new_edge: &E) -> Result<(), GraphError> {
-        self.verify_node(new_edge.get_first())?;
-        self.verify_node(new_edge.get_second())?;
-        Ok(())
-    }
-
-    fn verify(&self) -> Result<(), GraphError> {
-        for edge in self.get_edge_ids().into_iter().map(|id| self.get_edge(id).unwrap()) {
-            self.verify_edge(edge)?;
-        }
-        Ok(())
-    }
-}
-
-impl<N: Node + NNew, E: Edge + ENew> Graph<N, E> {
-    /// Add edge from nodes only if nodes already exist in graph
-    pub fn add_edge_from_nodes(&mut self, first: NodeId, second: NodeId) -> Result<EdgeId, GraphError>{
-        self.verify_node(&first)?;
-        self.verify_node(&second)?;
-        Ok(self.edge_map.add_from_nodes(first, second))
-    }
-}
-
-impl<N: Node, E: Edge> fmt::Debug for Graph<N, E> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Graph {{ {:?}, {:?} }}", self.node_map, self.edge_map)?;
-        Ok(())
-    }
-}
-
-// impl<N: Node + Serialize, E: Edge + Serialize> Serialize for Graph<N, E> {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: serde::Serializer {
-//         // serializer.serialize_map(len)
-//     }
-// }
 
 
 pub(crate) mod graph_tests {
@@ -253,11 +108,11 @@ pub(crate) mod graph_tests {
 
     use serde::{Deserialize, Serialize};
 
-    use crate::{core::{edge::EdgeMap, graph::{Edge, EdgeId, Graph, IGraph, Node, NodeId}, node::NodeMap}, utils::new_trait::{ENew, NNew}};
+    use crate::{core::{edge::EdgeMap, graph::{Edge, EdgeId, Graph, Node, NodeId}, node::NodeMap}, graphs::hashgraph::HashGraph, utils::new_trait::{ENew, NNew}};
     use crate::utils::saveload::{load_from_json, save_to_json};
 
-    pub fn get_example_graph<N: Node + NNew, E: Edge + ENew>() -> Graph<N, E> {
-        let mut graph = Graph { node_map: NodeMap::<N>::new(), edge_map: EdgeMap::<E>::new() };
+    pub fn get_example_graph<N: Node + NNew, E: Edge + ENew>() -> HashGraph<N, E> {
+        let mut graph = HashGraph { node_map: NodeMap::<N>::new(), edge_map: EdgeMap::<E>::new() };
         for _ in 0..7 { graph.add_node(N::new()); }
         graph.remove_node(&NodeId(3));
         let _ = graph.add_edge(E::new(NodeId(0), NodeId(0)));
@@ -275,7 +130,7 @@ pub(crate) mod graph_tests {
     // Add
 
     pub fn test_add_node_helper<N: Node + Default, E: Edge>() {
-        let mut graph = Graph::<N, E>::new();
+        let mut graph = HashGraph::<N, E>::new();
         let node_id0 = graph.add_node(N::default());
         let node_id1 = graph.add_node(N::default());
         assert_eq!(node_id0, NodeId(0));
@@ -287,7 +142,7 @@ pub(crate) mod graph_tests {
     }
 
     pub fn test_add_edge_helper<N: Node + NNew, E: Edge + ENew>() {
-        let mut graph = Graph::<N, E>::new();
+        let mut graph = HashGraph::<N, E>::new();
         graph.add_node(N::default());
         graph.add_node(N::default());
         let mut edge = E::default();
@@ -298,7 +153,7 @@ pub(crate) mod graph_tests {
     }
 
     pub fn test_add_edge_from_nodes_helper<N: Node + NNew, E: ENew>() {
-        let mut graph = Graph::<N, E>::new();
+        let mut graph = HashGraph::<N, E>::new();
         assert!(graph.add_edge_from_nodes(NodeId(0), NodeId(1)).is_err());
         graph.add_node(N::default());
         graph.add_node(N::default());
@@ -307,7 +162,7 @@ pub(crate) mod graph_tests {
 
     
     pub fn test_add_edge_with_invalid_nodes_helper<N: Node + NNew, E: Edge + ENew>() {
-        let mut graph = Graph::<N, E>::new();
+        let mut graph = HashGraph::<N, E>::new();
         let edge = E::default();
         let edge2 = E::default();
         println!("{edge:?}");
@@ -434,7 +289,7 @@ pub(crate) mod graph_tests {
         assert!(save_to_json(path, &g).is_ok());
 
         // load
-        let g_save_load = load_from_json::<Graph<N, E>>(&path);
+        let g_save_load = load_from_json::<HashGraph<N, E>>(&path);
         assert!(g_save_load.is_ok());
 
         assert_eq!(initial_debug, format!("{:?}", g_save_load.unwrap()))

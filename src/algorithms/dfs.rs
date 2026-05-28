@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::core::{edge::{Edge, EdgeId}, error::GraphError, graph::{Graph, IGraph}, node::{Node, NodeId}};
+use crate::{core::{edge::{Edge, EdgeId}, error::GraphError, graph::Graph, node::{Node, NodeId}}, graphs::hashgraph::HashGraph};
 
-impl<N: Node, E: Edge> Graph<N,E> {
+impl<N: Node, E: Edge> HashGraph<N,E> {
     /// Returns true if dfs was successful and false is not. writes appropriate path and visits between nodes.
     fn hidden_dfs<'a>(&mut self, start: NodeId, end: NodeId,
         visited_nodes: &mut HashSet<NodeId>, path_stack: &mut Vec<(NodeId, EdgeId)>) -> bool {
@@ -50,7 +50,7 @@ impl<N: Node, E: Edge> Graph<N,E> {
 
 #[cfg(test)]
 mod dfs_tests {
-    use crate::{core::{edge::{Edge, EdgeId}, graph::{Graph, IGraph, graph_tests::get_example_graph}, node::{Node, NodeId}}, graphs::basic::{BasicEdge, BasicNode}, utils::new_trait::{ENew, NNew}};
+    use crate::{core::{edge::{Edge, EdgeId}, graph::{Graph, graph_tests::get_example_graph}, node::{Node, NodeId}}, graphs::{basic::{BasicEdge, BasicNode}, hashgraph::HashGraph}, utils::new_trait::{ENew, NNew}};
 
     #[test]
     fn test_dfs_success() {
@@ -70,7 +70,7 @@ mod dfs_tests {
 
     #[test]
     fn test_simple_dfs_with_failures() {
-        let mut graph = Graph::<BasicNode, BasicEdge>::new();
+        let mut graph = HashGraph::<BasicNode, BasicEdge>::new();
 
         // Try dfs on emtpy graph
         assert!(graph.dfs(NodeId(0), NodeId(1)).is_none());
